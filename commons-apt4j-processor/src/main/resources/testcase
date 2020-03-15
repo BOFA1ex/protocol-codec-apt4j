@@ -1,0 +1,737 @@
+package com.bofa.protocol.flv;
+
+import com.bofa.protocol.flv.model.*;
+import com.bofa.resolve.method.convert.*;
+import com.bofa.resolve.method.convert.flv.FlvTimeStampExtensionConvertMethod;
+import com.bofa.resolve.method.exception.flv.FlvDecodeResolveExceptionMethod;
+import com.bofa.resolve.util.ChannelSpelContextUtils;
+import io.netty.buffer.*;
+import io.netty.channel.Channel;
+
+import java.util.*;
+import java.util.function.BiConsumer;
+
+/**
+ * generate by javapoet
+ *
+ * @author "Bofa"
+ * @since 2020-02-19 23:07:10
+ */
+public class FlvParserImpl implements FlvParser {
+    /**
+     * generate by javapoet
+     *
+     * @author "Bofa"
+     * @since 2020-02-19 23:07:10
+     */
+    private void _init(String objName, Object obj, ByteBuf buffer, Channel channel) {
+        ChannelSpelContextUtils.setVariable(objName, obj, channel);
+        ChannelSpelContextUtils.setVariable(objName + "_buffer", buffer, channel);
+    }
+
+    /**
+     * generate by javapoet
+     *
+     * @author "Bofa"
+     * @since 2020-02-19 23:07:10
+     */
+    private ByteBuf markAndReadSlice(ByteBuf buffer, int index, int length) {
+        // before readSlice, we need mark the reader index.
+        buffer.readerIndex(index);
+        try {
+            return buffer.readSlice(length);
+        } catch (IndexOutOfBoundsException e) {
+            System.err.println(String.format("数据包不完整 %s", e.getMessage()));
+            // 尝试用不完整数据包去解析;
+            return buffer.readSlice(buffer.readableBytes());
+        }
+    }
+
+    @Override
+    public FlvFile decode(ByteBuf buffer, Channel channel) {
+        // 基准readerIndex standardReaderIndex
+        final int standardReaderIndex = buffer.readerIndex();
+        FlvFile flvFile = null;
+        try {
+            flvFile = _e12fdFlvFile(buffer, channel, standardReaderIndex);
+        } catch (Exception e) {
+            flvFile = (FlvFile) FlvDecodeResolveExceptionMethod.INSTANCE.resolveException(FlvFile.class, e, channel);
+        }
+        return flvFile;
+    }
+
+    private String _6c186Signature(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf _7ddd3Buffer = markAndReadSlice(buffer, index, length);
+        String signature = AsciiConvertMethod.INSTANCE.decode(_7ddd3Buffer, channel);
+        return signature;
+    }
+
+    private Integer _0d93aVersion(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("3 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _acd1fBuffer = markAndReadSlice(buffer, index, length);
+        Integer version = IntegerConvertMethod.INSTANCE.decode(_acd1fBuffer, channel);
+        return version;
+    }
+
+    private Integer _6a8c5TypeFlagsReserved(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _834c8Buffer = markAndReadSlice(buffer, index, length);
+        Integer typeFlagsReserved = BinaryIntegerConvertMethod.INSTANCE.decode(_834c8Buffer, channel, "0", "4");
+        return typeFlagsReserved;
+    }
+
+    private Integer _61bddTypeFlagsAudio(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _c7b03Buffer = markAndReadSlice(buffer, index, length);
+        Integer typeFlagsAudio = BinaryIntegerConvertMethod.INSTANCE.decode(_c7b03Buffer, channel, "4", "5");
+        return typeFlagsAudio;
+    }
+
+    private Integer _007deTypeFlagsReserved2(ByteBuf buffer, Channel channel,
+                                             int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _2c0d7Buffer = markAndReadSlice(buffer, index, length);
+        Integer typeFlagsReserved2 = BinaryIntegerConvertMethod.INSTANCE.decode(_2c0d7Buffer, channel, "5", "6");
+        return typeFlagsReserved2;
+    }
+
+    private Integer _57269TypeFlagsVideo(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _0c0daBuffer = markAndReadSlice(buffer, index, length);
+        Integer typeFlagsVideo = BinaryIntegerConvertMethod.INSTANCE.decode(_0c0daBuffer, channel, "6", "7");
+        return typeFlagsVideo;
+    }
+
+    private Integer _819a1DataOffset(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("5 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("4", channel, int.class);
+        final ByteBuf _7b38dBuffer = markAndReadSlice(buffer, index, length);
+        Integer dataOffset = IntegerConvertMethod.INSTANCE.decode(_7b38dBuffer, channel);
+        return dataOffset;
+    }
+
+    private List<FlvTag> _1cd12FlvTags(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("9 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvFile_buffer.readableBytes()", channel, int.class);
+        final ByteBuf _ef449Buffer = markAndReadSlice(buffer, index, length);
+        List<FlvTag> flvTags = new ArrayList<>();
+        _init("flvTags", flvTags, _ef449Buffer, channel);
+        while (_ef449Buffer.isReadable()) {
+            final int _13f07StandardReaderIndex = _ef449Buffer.readerIndex();
+            FlvTag flvTag = _fd9baFlvTag(_ef449Buffer, channel, _13f07StandardReaderIndex);
+            flvTags.add(flvTag);
+        }
+        return flvTags;
+    }
+
+    private Integer _9258aPrevTagSize(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("4", channel, int.class);
+        final ByteBuf _79bb3Buffer = markAndReadSlice(buffer, index, length);
+        Integer prevTagSize = IntegerConvertMethod.INSTANCE.decode(_79bb3Buffer, channel);
+        return prevTagSize;
+    }
+
+    private Integer _e147bTagType(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _83280Buffer = markAndReadSlice(buffer, index, length);
+        Integer tagType = IntegerConvertMethod.INSTANCE.decode(_83280Buffer, channel);
+        return tagType;
+    }
+
+    private Integer _d6a91DataLength(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("5 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf _eaf82Buffer = markAndReadSlice(buffer, index, length);
+        Integer dataLength = IntegerConvertMethod.INSTANCE.decode(_eaf82Buffer, channel);
+        return dataLength;
+    }
+
+    private Integer _5ad4dTimeStamp(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("8 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf _33f8aBuffer = markAndReadSlice(buffer, index, length);
+        Integer timeStamp = IntegerConvertMethod.INSTANCE.decode(_33f8aBuffer, channel);
+        return timeStamp;
+    }
+
+    private FlvTag _fd9baFlvTag(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        FlvTag flvTag = new FlvTag();
+        _init("flvTag", flvTag, buffer, channel);
+        Integer prevTagSize = _9258aPrevTagSize(buffer, channel, standardReaderIndex);
+        flvTag.setPrevTagSize(prevTagSize);
+        Integer tagType = _e147bTagType(buffer, channel, standardReaderIndex);
+        flvTag.setTagType(tagType);
+        Integer dataLength = _d6a91DataLength(buffer, channel, standardReaderIndex);
+        flvTag.setDataLength(dataLength);
+        Integer timeStamp = _5ad4dTimeStamp(buffer, channel, standardReaderIndex);
+        flvTag.setTimeStamp(timeStamp);
+        Integer timeStampExtension = _2363cTimeStampExtension(buffer, channel, standardReaderIndex);
+        flvTag.setTimeStampExtension(timeStampExtension);
+        String streamId = _f97ceStreamId(buffer, channel, standardReaderIndex);
+        flvTag.setStreamId(streamId);
+        FlvAudioTagBody flvAudioTagBody = _94d66FlvAudioTagBody(buffer, channel, standardReaderIndex);
+        flvTag.setFlvAudioTagBody(flvAudioTagBody);
+//        FlvVideoTagBody flvVideoTagBody = _4c69fFlvVideoTagBody(buffer, channel, standardReaderIndex);
+//        flvTag.setFlvVideoTagBody(flvVideoTagBody);
+//        FlvScriptTagBody flvScriptTagBody = _bef21FlvScriptTagBody(buffer, channel, standardReaderIndex);
+//        flvTag.setFlvScriptTagBody(flvScriptTagBody);
+        return flvTag;
+    }
+
+    private String _f97ceStreamId(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("12 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf _83591Buffer = markAndReadSlice(buffer, index, length);
+        String streamId = HexConvertMethod.INSTANCE.decode(_83591Buffer, channel);
+        return streamId;
+    }
+
+    private Integer _2363cTimeStampExtension(ByteBuf buffer, Channel channel,
+                                             int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("8 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("4", channel, int.class);
+        final ByteBuf _7db95Buffer = markAndReadSlice(buffer, index, length);
+        Integer timeStampExtension = FlvTimeStampExtensionConvertMethod.INSTANCE.decode(_7db95Buffer, channel);
+        return timeStampExtension;
+    }
+
+    private FlvScriptTagBody _bef21FlvScriptTagBody(ByteBuf buffer, Channel channel,
+                                                    int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("#flvTag.tagType == 18", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("15 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvTag.dataLength", channel, int.class);
+        final ByteBuf _3ff48Buffer = markAndReadSlice(buffer, index, length);
+        FlvScriptTagBody flvScriptTagBody = new FlvScriptTagBody();
+        _init("flvScriptTagBody", flvScriptTagBody, _3ff48Buffer, channel);
+        // 这里要更改基准readerIndex
+        final int _7ec62StandardReaderIndex = _3ff48Buffer.readerIndex();
+        String data = _59afaData(_3ff48Buffer, channel, _7ec62StandardReaderIndex);
+        flvScriptTagBody.setData(data);
+        return flvScriptTagBody;
+    }
+
+    private FlvVideoTagBody _4c69fFlvVideoTagBody(ByteBuf buffer, Channel channel,
+                                                  int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("#flvTag.tagType == 9", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("15 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvTag.dataLength", channel, int.class);
+        final ByteBuf _8a005Buffer = markAndReadSlice(buffer, index, length);
+        FlvVideoTagBody flvVideoTagBody = new FlvVideoTagBody();
+        _init("flvVideoTagBody", flvVideoTagBody, _8a005Buffer, channel);
+        // 这里要更改基准readerIndex
+        final int _02516StandardReaderIndex = _8a005Buffer.readerIndex();
+        Integer frameType = _daae1FrameType(_8a005Buffer, channel, _02516StandardReaderIndex);
+        flvVideoTagBody.setFrameType(frameType);
+        Integer codecId = _a635fCodecId(_8a005Buffer, channel, _02516StandardReaderIndex);
+        flvVideoTagBody.setCodecId(codecId);
+        String data = _36cffData(_8a005Buffer, channel, _02516StandardReaderIndex);
+        flvVideoTagBody.setData(data);
+        return flvVideoTagBody;
+    }
+
+    private Integer _8acfbSoundFormat(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _f295bBuffer = markAndReadSlice(buffer, index, length);
+        Integer soundFormat = BinaryIntegerConvertMethod.INSTANCE.decode(_f295bBuffer, channel, "0", "3");
+        return soundFormat;
+    }
+
+    private FlvAudioTagBody _94d66FlvAudioTagBody(ByteBuf buffer, Channel channel,
+                                                  int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("#flvTag.tagType == 8", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("15 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvTag.dataLength", channel, int.class);
+        final ByteBuf _8e7f9Buffer = markAndReadSlice(buffer, index, length);
+        FlvAudioTagBody flvAudioTagBody = new FlvAudioTagBody();
+        _init("flvAudioTagBody", flvAudioTagBody, _8e7f9Buffer, channel);
+        // 这里要更改基准readerIndex
+        final int _cfca7StandardReaderIndex = _8e7f9Buffer.readerIndex();
+        Integer soundFormat = _8acfbSoundFormat(_8e7f9Buffer, channel, _cfca7StandardReaderIndex);
+        flvAudioTagBody.setSoundFormat(soundFormat);
+//        Integer soundRate = _a8e55SoundRate(_8e7f9Buffer, channel, _cfca7StandardReaderIndex);
+//        flvAudioTagBody.setSoundRate(soundRate);
+//        Integer soundSize = _2ff82SoundSize(_8e7f9Buffer, channel, _cfca7StandardReaderIndex);
+//        flvAudioTagBody.setSoundSize(soundSize);
+//        Integer soundType = _af884SoundType(_8e7f9Buffer, channel, _cfca7StandardReaderIndex);
+//        flvAudioTagBody.setSoundType(soundType);
+//        String soundData = _3b7ceSoundData(_8e7f9Buffer, channel, _cfca7StandardReaderIndex);
+//        flvAudioTagBody.setSoundData(soundData);
+//        _8e7f9Buffer.release();
+        return flvAudioTagBody;
+    }
+
+    private Integer _daae1FrameType(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _79adbBuffer = markAndReadSlice(buffer, index, length);
+        Integer frameType = BinaryIntegerConvertMethod.INSTANCE.decode(_79adbBuffer, channel, "0", "3");
+        return frameType;
+    }
+
+    private Integer _a8e55SoundRate(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _dbd21Buffer = markAndReadSlice(buffer, index, length);
+        Integer soundRate = BinaryIntegerConvertMethod.INSTANCE.decode(_dbd21Buffer, channel, "3", "5");
+        return soundRate;
+    }
+
+    private Integer _a635fCodecId(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _9d946Buffer = markAndReadSlice(buffer, index, length);
+        Integer codecId = BinaryIntegerConvertMethod.INSTANCE.decode(_9d946Buffer, channel, "3", "7");
+        return codecId;
+    }
+
+    private String _59afaData(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvScriptTagBody_buffer.readableBytes()", channel, int.class);
+        final ByteBuf _11b3dBuffer = markAndReadSlice(buffer, index, length);
+        String data = HexConvertMethod.INSTANCE.decode(_11b3dBuffer, channel);
+        return data;
+    }
+
+    private Integer _2ff82SoundSize(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _b5129Buffer = markAndReadSlice(buffer, index, length);
+        Integer soundSize = BinaryIntegerConvertMethod.INSTANCE.decode(_b5129Buffer, channel, "5", "6");
+        return soundSize;
+    }
+
+    private Integer _af884SoundType(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf _b1222Buffer = markAndReadSlice(buffer, index, length);
+        Integer soundType = BinaryIntegerConvertMethod.INSTANCE.decode(_b1222Buffer, channel, "6", "7");
+        return soundType;
+    }
+
+    private String _36cffData(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvVideoTagBody_buffer.readableBytes()", channel, int.class);
+        final ByteBuf _bad79Buffer = markAndReadSlice(buffer, index, length);
+        String data = HexConvertMethod.INSTANCE.decode(_bad79Buffer, channel);
+        return data;
+    }
+
+    private String _3b7ceSoundData(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return null;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("1 + " + standardReaderIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvAudioTagBody_buffer.readableBytes()", channel, int.class);
+        final ByteBuf _78e24Buffer = markAndReadSlice(buffer, index, length);
+        String soundData = HexConvertMethod.INSTANCE.decode(_78e24Buffer, channel);
+        return soundData;
+    }
+
+    private FlvFile _e12fdFlvFile(ByteBuf buffer, Channel channel, int standardReaderIndex) {
+        FlvFile flvFile = new FlvFile();
+        _init("flvFile", flvFile, buffer, channel);
+        String signature = _6c186Signature(buffer, channel, standardReaderIndex);
+        flvFile.setSignature(signature);
+        Integer version = _0d93aVersion(buffer, channel, standardReaderIndex);
+        flvFile.setVersion(version);
+        Integer typeFlagsReserved = _6a8c5TypeFlagsReserved(buffer, channel, standardReaderIndex);
+        flvFile.setTypeFlagsReserved(typeFlagsReserved);
+        Integer typeFlagsAudio = _61bddTypeFlagsAudio(buffer, channel, standardReaderIndex);
+        flvFile.setTypeFlagsAudio(typeFlagsAudio);
+        Integer typeFlagsReserved2 = _007deTypeFlagsReserved2(buffer, channel, standardReaderIndex);
+        flvFile.setTypeFlagsReserved2(typeFlagsReserved2);
+        Integer typeFlagsVideo = _57269TypeFlagsVideo(buffer, channel, standardReaderIndex);
+        flvFile.setTypeFlagsVideo(typeFlagsVideo);
+        Integer dataOffset = _819a1DataOffset(buffer, channel, standardReaderIndex);
+        flvFile.setDataOffset(dataOffset);
+        List<FlvTag> flvTags = _1cd12FlvTags(buffer, channel, standardReaderIndex);
+        flvFile.setFlvTags(flvTags);
+        return flvFile;
+    }
+
+    private void _6d186Signature(ByteBuf buffer, String signature, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf encodeBuffer = AsciiConvertMethod.INSTANCE.encode(signature, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+                buffer.writeByte(encodeBuffer.readByte() + value);
+                return true;
+            }
+        );
+//        final ByteBuf slice = markAndWriteSlice(buffer, index, length);
+//        AsciiConvertMethod.INSTANCE.encode(signature, buffer, channel);
+//        // 检查buffer缓冲区在[index, index+length]是否有数据, 采取不覆盖继续累加的做法
+//        beforeWriteBytes(buffer, index, length, (i, value) -> {
+//            _encodeSignatureBuffer.writeByte(_encodeSignatureBuffer.getByte(i) + value);
+//        });
+//        final int writerIndex = _encodeSignatureBuffer.writerIndex();
+//        // 切片缓冲区会自动扩容可写入大小, 但是如果大于maxCapacity会抛出异常, 这里不捕捉
+//        slice.ensureWritable(writerIndex).writeBytes(_encodeSignatureBuffer);
+//        // slice不会修改上一级缓冲区的读写索引, 需要手动调写索引
+//        buffer.writerIndex(buffer.writerIndex() + writerIndex);
+    }
+
+    private void _0d94aVersion(ByteBuf buffer, Integer version, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("3 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf encodeBuffer = IntegerConvertMethod.INSTANCE.encode(version, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _6a8c6TypeFlagsReserved(ByteBuf buffer, Integer typeFlagsReserved, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf encodeBuffer = BinaryIntegerConvertMethod.INSTANCE.encode(typeFlagsReserved, length, channel, "0", "4");
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+
+    private void _62bddTypeFlagsAudio(ByteBuf buffer, Integer typeFlagsAudio, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf encodeBuffer = BinaryIntegerConvertMethod.INSTANCE.encode(typeFlagsAudio, length, channel, "4", "5");
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _008deTypeFlagsReserved2(ByteBuf buffer, Integer typeFlagsReserved2, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf encodeBuffer = BinaryIntegerConvertMethod.INSTANCE.encode(typeFlagsReserved2, length, channel, "5", "6");
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _819a2DataOffset(ByteBuf buffer, Integer dataOffset, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("5 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("4", channel, int.class);
+        final ByteBuf encodeBuffer = IntegerConvertMethod.INSTANCE.encode(dataOffset, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _57369TypeFlagsVideo(ByteBuf buffer, Integer typeFlagsVideo, Channel channel, int standardWriterIndex) {
+        if (typeFlagsVideo == null) {
+            return;
+        }
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf encodeBuffer = BinaryIntegerConvertMethod.INSTANCE.encode(typeFlagsVideo, length, channel, "6", "7");
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _7f295FlvTags(ByteBuf buffer, List<FlvTag> flvTags, Channel channel, int standardWriterIndex) {
+        if (flvTags == null) {
+            return;
+        }
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("9 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvFile_buffer.readableBytes()", channel, int.class);
+        if (length == buffer.readableBytes()) {
+            length = buffer.writableBytes();
+        }
+        final ByteBuf _ef449Buffer = buffer.slice(index, length).clear();
+        _init("flvTags", flvTags, _ef449Buffer, channel);
+        for (final FlvTag flvTag : flvTags) {
+            final int _13f07StandardWriterIndex = _ef449Buffer.writerIndex();
+            _fg9baFlvTag(_ef449Buffer, flvTag, channel, _13f07StandardWriterIndex);
+        }
+        buffer.writerIndex(buffer.writerIndex() + _ef449Buffer.writerIndex());
+    }
+
+    private void _fg9baFlvTag(ByteBuf buffer, FlvTag flvTag, Channel channel, int standardWriterIndex) {
+        _init("flvTag", flvTag, buffer, channel);
+        _9268aPrevTagSize(buffer, flvTag.getPrevTagSize(), channel, standardWriterIndex);
+        _e147cTagType(buffer, flvTag.getTagType(), channel, standardWriterIndex);
+        _d6a92DataLength(buffer, flvTag.getDataLength(), channel, standardWriterIndex);
+        _5ad5dTimeStamp(buffer, flvTag.getTimeStamp(), channel, standardWriterIndex);
+        _2364cTimeStampExtension(buffer, flvTag.getTimeStampExtension(), channel, standardWriterIndex);
+        _f98ceStreamId(buffer, flvTag.getStreamId(), channel, standardWriterIndex);
+        _94d67FlvAudioTagBody(buffer, flvTag.getFlvAudioTagBody(), channel, standardWriterIndex);
+//        _4c69fFlvVideoTagBody(buffer, flvTag.getFlvVideoTagBody(), channel, standardWriterIndex);
+//        _bef21FlvScriptTagBody(buffer, flvTag.getFlvScriptTagBody(), channel, standardWriterIndex);
+    }
+
+    private void _94d67FlvAudioTagBody(ByteBuf buffer, FlvAudioTagBody flvAudioTagBody, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("#flvTag.tagType == 8", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("15 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("#flvTag.dataLength", channel, int.class);
+        final ByteBuf _8e7f9Buffer = buffer.slice(index, length).clear();
+        _init("flvAudioTagBody", flvAudioTagBody, _8e7f9Buffer, channel);
+        // 这里要更改基准writerIndex
+        final int _cfca7StandardWriterIndex = _8e7f9Buffer.writerIndex();
+        _9acfbSoundFormat(_8e7f9Buffer, flvAudioTagBody.getSoundFormat(), channel, _cfca7StandardWriterIndex);
+//        _a8e55SoundRate(_8e7f9Buffer, channel, _cfca7StandardWriterIndex);
+//        _2ff82SoundSize(_8e7f9Buffer, channel, _cfca7StandardWriterIndex);
+//        _af884SoundType(_8e7f9Buffer, channel, _cfca7StandardWriterIndex);
+//        _3b7ceSoundData(_8e7f9Buffer, channel, _cfca7StandardWriterIndex);
+    }
+
+    private void _9acfbSoundFormat(ByteBuf buffer, Integer soundFormat, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf encodeBuffer = BinaryIntegerConvertMethod.INSTANCE.encode(soundFormat, length, channel, "0", "3");
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _f98ceStreamId(ByteBuf buffer, String streamId, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("12 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf encodeBuffer = HexConvertMethod.INSTANCE.encode(streamId, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _2364cTimeStampExtension(ByteBuf buffer, Integer timeStampExtension, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("8 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("4", channel, int.class);
+        final ByteBuf encodeBuffer = FlvTimeStampExtensionConvertMethod.INSTANCE.encode(timeStampExtension, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _5ad5dTimeStamp(ByteBuf buffer, Integer timeStamp, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("8 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf encodeBuffer = IntegerConvertMethod.INSTANCE.encode(timeStamp, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _d6a92DataLength(ByteBuf buffer, Integer dataLength, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("5 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("3", channel, int.class);
+        final ByteBuf encodeBuffer = IntegerConvertMethod.INSTANCE.encode(dataLength, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    private void _e147cTagType(ByteBuf buffer, Integer tagType, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("4 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("1", channel, int.class);
+        final ByteBuf encodeBuffer = IntegerConvertMethod.INSTANCE.encode(tagType, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+    }
+
+    //
+    private void _9268aPrevTagSize(ByteBuf buffer, Integer prevTagSize, Channel channel, int standardWriterIndex) {
+        if (!ChannelSpelContextUtils.processExprAndGet("true", channel, boolean.class)) {
+            return;
+        }
+        int index = ChannelSpelContextUtils.processExprAndGet("0 + " + standardWriterIndex, channel, int.class);
+        int length = ChannelSpelContextUtils.processExprAndGet("4", channel, int.class);
+        final ByteBuf encodeBuffer = IntegerConvertMethod.INSTANCE.encode(prevTagSize, length, channel);
+        buffer.writerIndex(index);
+        buffer.forEachByte(index, length, value -> {
+            buffer.writeByte(encodeBuffer.readByte() + value);
+            return true;
+        });
+        encodeBuffer.release();
+    }
+
+    private void _d123FlvFile(ByteBuf buffer, FlvFile flvFile, Channel channel, int standardWriterIndex) {
+        _init("flvFile", flvFile, buffer, channel);
+        _6d186Signature(buffer, flvFile.getSignature(), channel, standardWriterIndex);
+        _0d94aVersion(buffer, flvFile.getVersion(), channel, standardWriterIndex);
+        _6a8c6TypeFlagsReserved(buffer, flvFile.getTypeFlagsReserved(), channel, standardWriterIndex);
+        _62bddTypeFlagsAudio(buffer, flvFile.getTypeFlagsAudio(), channel, standardWriterIndex);
+        _008deTypeFlagsReserved2(buffer, flvFile.getTypeFlagsReserved2(), channel, standardWriterIndex);
+        _57369TypeFlagsVideo(buffer, flvFile.getTypeFlagsVideo(), channel, standardWriterIndex);
+        _819a2DataOffset(buffer, flvFile.getDataOffset(), channel, standardWriterIndex);
+        _7f295FlvTags(buffer, flvFile.getFlvTags(), channel, standardWriterIndex);
+    }
+
+    @Override
+    public ByteBuf encode(FlvFile flvFile, Channel channel) {
+        final ByteBuf buffer = PooledByteBufAllocator.DEFAULT.buffer(2 << 11);
+        // 基准writeIndex standardWriteIndex
+        final int standardWriterIndex = buffer.writerIndex();
+        _d123FlvFile(buffer, flvFile, channel, standardWriterIndex);
+        return buffer;
+    }
+
+    /**
+     * generate by javapoet
+     *
+     * @author "Bofa"
+     * @since 2020-02-19 23:07:10
+     */
+    private ByteBuf markAndWriteSlice(ByteBuf buffer, int index, int length) {
+        try {
+            // before slice, mark the writer index.
+            buffer.markWriterIndex();
+            buffer.writerIndex(index);
+            return buffer.slice(index, length == 0 ? buffer.writableBytes() : length).clear();
+        } finally {
+            buffer.resetWriterIndex();
+        }
+    }
+
+}
