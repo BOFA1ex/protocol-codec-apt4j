@@ -1,8 +1,12 @@
 package com.bofa.commons.apt4j.management.internal.utils;
 
+import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 
-import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.element.Element;
+import javax.lang.model.type.*;
+import javax.lang.model.util.Types;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -19,6 +23,12 @@ public class TypeUtils {
         return type.tsym.getQualifiedName().toString();
     }
 
+    public static Symbol.TypeSymbol resolvePrimitiveType(Types typeUtils, TypeMirror typeMirror){
+        // typeUtils.asElement 返回的类型只有Symbol.TypeSymbol, 因此这里不担心会出CastException
+        // 考虑到typeUtils.asElement(primitiveType)会返回null, 这里需要对typeMirror进行包装, 返回包装类型
+        return (Symbol.TypeSymbol) Optional.ofNullable(typeUtils.asElement(typeMirror))
+                .orElseGet(() -> typeUtils.boxedClass((PrimitiveType) typeMirror));
+    }
     /**
      * 由于编译期间,class对象未初始实例, 这里会抛出MirroredTypeException的异常
      */

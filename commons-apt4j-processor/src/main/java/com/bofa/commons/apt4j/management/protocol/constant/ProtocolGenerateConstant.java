@@ -33,15 +33,17 @@ public interface ProtocolGenerateConstant {
     String BYTEBUF_QUALIFIER_NAME = "io.netty.buffer.ByteBuf";
     String BYTEBUF_TYPE_NAME = "ByteBuf";
     String VOID_QUALIFIER_NAME = "void";
+    String OBJECT_TYPE_NAME = "Object";
+    String OBJECT_QUALIFIER_NAME = "java.lang.Object";
 
     Type CHANNEL_UTILS_TYPE = new Type(CHANNEL_UTILS_TYPE_NAME, CHANNEL_UTILS_QUALIFIER_NAME);
     Type BYTEBUF_TYPE = new Type(BYTEBUF_TYPE_NAME, BYTEBUF_QUALIFIER_NAME);
-    Type CHANNEL_TYPE  = new Type(CHANNEL_TYPE_NAME, CHANNEL_QUALIFIER_NAME);
-    Type INTEGER_TYPE = new Type("Integer","java.lang.Integer");
-    Type STRING_TYPE = new Type("String","java.lang.String");
-    Type OBJECT_TYPE = new Type("Object","java.lang.Object");
-    Type VOID_TYPE = new Type("void","void");
-    
+    Type CHANNEL_TYPE = new Type(CHANNEL_TYPE_NAME, CHANNEL_QUALIFIER_NAME);
+    Type INTEGER_TYPE = new Type("Integer", "java.lang.Integer");
+    Type STRING_TYPE = new Type("String", "java.lang.String");
+    Type OBJECT_TYPE = new Type(OBJECT_TYPE_NAME, OBJECT_QUALIFIER_NAME);
+    Type VOID_TYPE = new Type("void", "void");
+
 //    Type INTEGER_TYPE = new Type("Integer","java.lang.Integer");
 //    Type INTEGER_TYPE = new Type("Integer","java.lang.Integer");
 
