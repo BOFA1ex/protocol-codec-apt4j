@@ -3,18 +3,13 @@ package com.bofa.commons.apt4j.management.internal.utils;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 
-import javax.lang.model.element.Element;
-import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.*;
 import javax.lang.model.util.Types;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ElementUtils {
-    /**
-     * @param packageElement
-     *
-     * @return
-     */
+
     public static String getPackageName(PackageElement packageElement) {
         return packageElement.getQualifiedName().toString();
     }
@@ -27,6 +22,11 @@ public class ElementUtils {
 
     public static Element getGenericElement(Types types, Symbol symbol) {
         return getGenericElements(types, symbol).get(0);
+    }
+
+    public static boolean isAbstractClass(TypeElement typeElement){
+        return typeElement.getKind() == ElementKind.CLASS &&
+                typeElement.getModifiers().stream().anyMatch(modifier -> modifier.equals(Modifier.ABSTRACT));
     }
 
     /**
