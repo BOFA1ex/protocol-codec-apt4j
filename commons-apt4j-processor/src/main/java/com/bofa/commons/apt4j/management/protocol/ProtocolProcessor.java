@@ -40,7 +40,7 @@ public class ProtocolProcessor extends AbstractProcessor {
     private static final String LOGBACK_ENV_VARIABLE = "UseLogback";
     private static final String COMPONENT_ENV_VARIABLE = "UseComponent";
 
-//    /* 语法树 */
+    //    /* 语法树 */
 //    private Trees trees;
 //    /* 树节点创建工具类 */
 //    private TreeMaker treeMaker;
@@ -96,7 +96,8 @@ public class ProtocolProcessor extends AbstractProcessor {
 
     /**
      * exist impl element
-     * @param element  element which kind is interface/abstract class
+     *
+     * @param element element which kind is interface/abstract class
      */
     boolean notExistImplElement(Element element, RoundEnvironment roundEnv) {
         final Protocol protocolAnon = element.getAnnotation(Protocol.class);
@@ -124,10 +125,10 @@ public class ProtocolProcessor extends AbstractProcessor {
                         .build())
                 .build();
         // process logback&component options
-        processLogbackOption(protocolImplModel);
+        final boolean useLogback = processLogbackOption(protocolImplModel);
         processComponentOption(protocolImplModel);
         // process common methods
-        ProtocolCommonProcessor.processCommonMethods(protocolImplModel, element);
+        ProtocolCommonProcessor.processCommonMethods(protocolImplModel, element, useLogback);
         element.getEnclosedElements().stream()
                 .filter(ele -> ele instanceof ExecutableElement)
                 .map(ele -> (Symbol.MethodSymbol) ele)
@@ -154,7 +155,7 @@ public class ProtocolProcessor extends AbstractProcessor {
         return protocolImplModel;
     }
 
-    void processLogbackOption(ProtocolImpl protocolImplModel) {
+    boolean processLogbackOption(ProtocolImpl protocolImplModel) {
         final String LOGGER_IMPL_TYPE_QUALIFIER_NAME = "org.slf4j.impl.StaticLoggerBinder";
         final boolean useLogback = Boolean.parseBoolean(options.getOrDefault(LOGBACK_ENV_VARIABLE, "true"));
         if (useLogback) {
@@ -162,6 +163,7 @@ public class ProtocolProcessor extends AbstractProcessor {
             protocolImplModel.getImport_stats().add("org.slf4j.*");
         }
         FreeMarkerModelGenerator.initConfigurationLogbackEnv(useLogback);
+        return useLogback;
     }
 
     void processComponentOption(ProtocolImpl protocolImplModel) {
@@ -187,14 +189,14 @@ public class ProtocolProcessor extends AbstractProcessor {
 
     static class ProtocolCommonProcessor {
 
-        static void processCommonMethods(ProtocolImpl protocolImpl, Symbol.ClassSymbol element) {
+        static void processCommonMethods(ProtocolImpl protocolImpl, Symbol.ClassSymbol element, boolean useLogback) {
             // build markAndReadSlice method.
-            processInitMarkAndReadSliceMethod(protocolImpl);
+            processInitMarkAndReadSliceMethod(protocolImpl, useLogback);
             // build initChannelSpelContext method
             processInitChannelSpelContextMethod(protocolImpl, element);
         }
 
-        static void processInitMarkAndReadSliceMethod(ProtocolImpl protocolImpl) {
+        static void processInitMarkAndReadSliceMethod(ProtocolImpl protocolImpl, boolean useLogback) {
             final String METHOD_NAME = "markAndReadSlice";
             final String BUFFER_METHOD_PARAMETER_NAME = "buffer";
             final String INDEX_METHOD_PARAMETER_NAME = "index";
@@ -212,7 +214,7 @@ public class ProtocolProcessor extends AbstractProcessor {
                             ))
                             .is_override(isOverride)
                             .build())
-                    .log_message(InitMarkAndReadSliceMethod.DEFAULT_LOG_MESSAGE)
+                    .log_message(useLogback ? InitMarkAndReadSliceMethod.LOGBACK_LOG_MESSAGE : InitMarkAndReadSliceMethod.SYSTEM_LOG_MESSAGE)
                     .buffer_parameter(BUFFER_METHOD_PARAMETER_NAME)
                     .reader_index_parameter(INDEX_METHOD_PARAMETER_NAME)
                     .length_parameter(LENGTH_METHOD_PARAMETER_NAME)

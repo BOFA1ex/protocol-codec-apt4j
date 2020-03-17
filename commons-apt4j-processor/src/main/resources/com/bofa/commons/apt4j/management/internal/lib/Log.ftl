@@ -11,21 +11,21 @@
 <#-- @see FreeMarkerModelGenerator shareVariables -->
 <#macro info ext>
     <#if useLogback>
-        logger.info(<#nested>);
+        logger.info(<#nested>, <#list ext as item>${item}<#if item_has_next>, </#if></#list>);
     <#else>
         <@compress single_line=true>System.out.println(String.format(<#lt><#nested>), <#list ext as item>${item}<#if item_has_next>, </#if></#list>);</@compress>
     </#if>
 </#macro>
 <#macro debug ext>
     <#if useLogback>
-        logger.debug(<#nested>);
+        logger.debug(<#nested>, <#list ext as item>${item}<#if item_has_next>, </#if></#list>);
     <#else>
        <@compress single_line=true>System.out.println(String.format(<#lt><#nested >), <#list ext as item>${item}<#if item_has_next>, </#if></#list>);</@compress>
     </#if>
 </#macro>
 <#macro error ext>
     <#if useLogback>
-        logger.error(<#nested>);
+        logger.error(<#nested>, <#list ext as item>${item}<#if item_has_next>, </#if></#list>);
     <#else>
         <@compress single_line=true>System.err.println(String.format(<#nested >, <#list ext as item>${item}<#if item_has_next>, </#if></#list>));</@compress>
     </#if>

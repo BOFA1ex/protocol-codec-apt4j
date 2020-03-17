@@ -17,7 +17,8 @@ import java.util.Set;
 @Builder
 public class InitMarkAndReadSliceMethod extends JavaModelWritable {
 
-    public static final String DEFAULT_LOG_MESSAGE = "\"数据包不完整 %s\"";
+    public static final String SYSTEM_LOG_MESSAGE = "\"数据包不完整 %s\"";
+    public static final String LOGBACK_LOG_MESSAGE = "\"数据包不完整 {}\"";
 
     private MethodHeadModel method_head;
     private String buffer_parameter;
