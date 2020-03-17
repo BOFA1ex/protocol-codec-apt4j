@@ -40,7 +40,12 @@ public class TestProtocolImpl {
     public void testProtocolImpl() {
         ProtocolImpl _impl = new ProtocolImpl(
                 "com.bofa.protocol.flv",
-                new TypeHead("public final", new Type("FlvParserImpl"), new Type("FlvParser"), null, true, null, null, false),
+                TypeHeadModel.builder()
+                        .modifier(TypeHeadModel.DEFAULT_MODIFIER)
+                        .class_type(new TypeModel("FlvParserImpl"))
+                        .interface_type(new TypeModel("FlvParser"))
+                        .needImplement(true)
+                        .build(),
                 _buildProtocolDecodeEntrance(),
                 Collections.singletonList(_buildProtocolDecodeRootObject()),
                 _buildProtocolEncodeEntrance(),
@@ -55,11 +60,11 @@ public class TestProtocolImpl {
 
 
     static ProtocolEncode$0 _buildProtocolEncodeEntrance() {
-        MethodParameter m1 = new MethodParameter(new Type("FlvFile"), "flvFile");
-        MethodParameter m2 = new MethodParameter(new Type("Channel"), "channel");
-        MethodHead methodHead = MethodHead.builder()
-                .modifier(MethodHead.PRIVATE_FINAL)
-                .return_type(new Type("ByteBuf"))
+        MethodParameterModel m1 = new MethodParameterModel(new TypeModel("FlvFile"), "flvFile");
+        MethodParameterModel m2 = new MethodParameterModel(new TypeModel("Channel"), "channel");
+        MethodHeadModel methodHead = MethodHeadModel.builder()
+                .modifier(MethodHeadModel.PRIVATE_FINAL)
+                .return_type(new TypeModel("ByteBuf"))
                 .method_name("encode")
                 .method_parameters(Arrays.asList(m1, m2))
                 .is_override(true)
@@ -80,7 +85,7 @@ public class TestProtocolImpl {
         return ProtocolEncode$0.builder()
                 .method_head(methodHead)
                 .validate_condition(initValidation)
-                .encode_type(new Type("FlvFile"))
+                .encode_type(new TypeModel("FlvFile"))
                 .encode_element_name("flvFile")
                 .encode_method_name("_d123FlvFile")
                 .encode_parameter("flvFile")
@@ -93,11 +98,11 @@ public class TestProtocolImpl {
     }
 
     static ProtocolDecode$0 _buildProtocolDecodeEntrance() {
-        MethodParameter m1 = new MethodParameter(new Type("ByteBuf"), "buffer");
-        MethodParameter m2 = new MethodParameter(new Type("Channel"), "channel");
-        MethodHead methodHead = MethodHead.builder()
-                .modifier(MethodHead.PRIVATE_FINAL)
-                .return_type(new Type("FlvFile"))
+        MethodParameterModel m1 = new MethodParameterModel(new TypeModel("ByteBuf"), "buffer");
+        MethodParameterModel m2 = new MethodParameterModel(new TypeModel("Channel"), "channel");
+        MethodHeadModel methodHead = MethodHeadModel.builder()
+                .modifier(MethodHeadModel.PRIVATE_FINAL)
+                .return_type(new TypeModel("FlvFile"))
                 .method_name("decode")
                 .method_parameters(Arrays.asList(m1, m2))
                 .is_override(true)
@@ -117,7 +122,7 @@ public class TestProtocolImpl {
                 .build();
         ProtocolDecode$0 protocolDecode = ProtocolDecode$0.builder()
                 .method_head(methodHead)
-                .decode_type(new Type("FlvFile"))
+                .decode_type(new TypeModel("FlvFile"))
                 .decode_element_name("flvFile")
                 .decode_method_name("_decodeFlvFile")
                 .buffer_parameter("buffer")
@@ -131,20 +136,20 @@ public class TestProtocolImpl {
     static ProtocolDecode$1 _buildProtocolDecodeRootObject() {
         final ByteBufConvertAnonModel convertAnonModel = ByteBufConvertAnonModel.builder().build();
         final ProtocolDecode$1 _decode = ProtocolDecode$1.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("FlvFile"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("FlvFile"))
                         .method_name("_e12fdFlvFile")
                         .method_parameters(Arrays.asList(
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("buffer")
                                         .param_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("channel")
                                         .param_type(ProtocolGenerateConstant.CHANNEL_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("standardReaderIndex")
                                         .param_type(ProtocolGenerateConstant.INTEGER_TYPE)
                                         .build()
@@ -160,7 +165,7 @@ public class TestProtocolImpl {
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolDecodePart$0.builder()
                         .convertAnonModel(convertAnonModel)
-                        .decode_type(new Type("FlvFile"))
+                        .decode_type(new TypeModel("FlvFile"))
                         .channel_parameter("channel")
                         .decode_type_name("flvFile")
                         .confused_buffer_name(null)
@@ -170,7 +175,7 @@ public class TestProtocolImpl {
                 .standard_reader_index_parameter("standardReaderIndex")
                 .member_mappings(new LinkedList<>())
                 .convert_model(convertAnonModel)
-                .decode_type(new Type("FlvFile"))
+                .decode_type(new TypeModel("FlvFile"))
                 .decode_element_name("flvFile")
                 .is_not_primitive(true)
                 .is_spel_object(true)
@@ -180,14 +185,14 @@ public class TestProtocolImpl {
                 .confused_standard_reader_index_name(null)
                 .build();
         Arrays.asList(
-                new InternalModelContext(new Type("String"), "signature", "_6c186Signature"),
-                new InternalModelContext(new Type("Integer"), "version", "_0d93aVersion"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsReserved", "_6a8c5TypeFlagsReserved"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
-                new InternalModelContext(new Type("Integer"), "dataOffset", "_819a1DataOffset"),
-                new InternalModelContext(new Type("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
+                new InternalModelContext(new TypeModel("String"), "signature", "_6c186Signature"),
+                new InternalModelContext(new TypeModel("Integer"), "version", "_0d93aVersion"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved", "_6a8c5TypeFlagsReserved"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
+                new InternalModelContext(new TypeModel("Integer"), "dataOffset", "_819a1DataOffset"),
+                new InternalModelContext(new TypeModel("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
         ).forEach(_decode::addInternalModelContext);
         return _decode;
     }
@@ -195,20 +200,20 @@ public class TestProtocolImpl {
     static ProtocolEncode$1 _buildProtocolEncodeRootObject() {
         final ByteBufConvertAnonModel convertAnonModel = ByteBufConvertAnonModel.builder().build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("void"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("void"))
                         .method_name("_d123FlvFile")
                         .method_parameters(Arrays.asList(
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("buffer")
                                         .param_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("channel")
                                         .param_type(ProtocolGenerateConstant.CHANNEL_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("standardWriterIndex")
                                         .param_type(ProtocolGenerateConstant.INTEGER_TYPE)
                                         .build()
@@ -232,7 +237,7 @@ public class TestProtocolImpl {
                 .standard_writer_index_parameter("standardWriterIndex")
                 .member_mappings(new LinkedList<>())
                 .convert_model(convertAnonModel)
-                .encode_type(new Type("FlvFile"))
+                .encode_type(new TypeModel("FlvFile"))
                 .encode_element_name("flvFile")
                 .is_not_primitive(true)
                 .is_spel_object(true)
@@ -242,29 +247,29 @@ public class TestProtocolImpl {
                 .confused_standard_writer_index_name(null)
                 .build();
         Arrays.asList(
-                new InternalModelContext(new Type("String"), "signature", "_6d186Signature"),
-                new InternalModelContext(new Type("Integer"), "version", "_0d94aVersion"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsReserved", "_6a8c6TypeFlagsReserved"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
-                new InternalModelContext(new Type("Integer"), "dataOffset", "_819a1DataOffset"),
-                new InternalModelContext(new Type("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
+                new InternalModelContext(new TypeModel("String"), "signature", "_6d186Signature"),
+                new InternalModelContext(new TypeModel("Integer"), "version", "_0d94aVersion"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved", "_6a8c6TypeFlagsReserved"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
+                new InternalModelContext(new TypeModel("Integer"), "dataOffset", "_819a1DataOffset"),
+                new InternalModelContext(new TypeModel("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
         ).forEach(_encode::addInternalModelContext);
         return _encode;
     }
 
     static InitChannelSpelContextMethod _buildInitChannelSpelContextMethod() {
         return InitChannelSpelContextMethod.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("void"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("void"))
                         .method_name("_init")
                         .method_parameters(Arrays.asList(
-                                new MethodParameter(new Type("String"), "objName"),
-                                new MethodParameter(new Type("Object"), "obj"),
-                                new MethodParameter(new Type("ByteBuf"), "buffer"),
-                                new MethodParameter(new Type("Channel"), "channel")
+                                new MethodParameterModel(new TypeModel("String"), "objName"),
+                                new MethodParameterModel(new TypeModel("Object"), "obj"),
+                                new MethodParameterModel(new TypeModel("ByteBuf"), "buffer"),
+                                new MethodParameterModel(new TypeModel("Channel"), "channel")
                         ))
                         .is_override(false)
                         .build()
@@ -278,14 +283,14 @@ public class TestProtocolImpl {
     static InitMarkAndReadSliceMethod _buildInitMarkAndReadSliceMethod() {
         return InitMarkAndReadSliceMethod.builder()
                 .log_message(InitMarkAndReadSliceMethod.DEFAULT_LOG_MESSAGE)
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("ByteBuf"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("ByteBuf"))
                         .method_name("markAndReadSlice")
                         .method_parameters(Arrays.asList(
-                                new MethodParameter(new Type("ByteBuf"), "buffer"),
-                                new MethodParameter(new Type("int"), "index"),
-                                new MethodParameter(new Type("int"), "length")
+                                new MethodParameterModel(new TypeModel("ByteBuf"), "buffer"),
+                                new MethodParameterModel(new TypeModel("int"), "index"),
+                                new MethodParameterModel(new TypeModel("int"), "length")
                         ))
                         .is_override(false)
                         .build())

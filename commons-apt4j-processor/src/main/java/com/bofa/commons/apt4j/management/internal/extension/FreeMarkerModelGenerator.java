@@ -46,16 +46,26 @@ public class FreeMarkerModelGenerator {
                 "includeModel",
                 new FreeMarkerModelIncludeDirective(CONFIGURATION)
         );
-        try {
-            // logback 全局环境参数
-            CONFIGURATION.setSharedVariable("useLogback", false);
-        } catch (TemplateModelException e) {
-            throw new RuntimeException(e);
-        }
         // do not refresh/gc the cached templates, as we never change them at runtime
         CONFIGURATION.setCacheStorage(new StrongCacheStorage());
         CONFIGURATION.setTemplateUpdateDelay(Integer.MAX_VALUE);
         CONFIGURATION.setLocalizedLookup(false);
+    }
+
+    public static void initConfigurationLogbackEnv(boolean useLogback){
+        try {
+            CONFIGURATION.setSharedVariable("useLogback", useLogback);
+        } catch (TemplateModelException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void initConfigurationSpringComponentEnv(boolean useComponent){
+        try {
+            CONFIGURATION.setSharedVariable("useComponent", useComponent);
+        } catch (TemplateModelException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

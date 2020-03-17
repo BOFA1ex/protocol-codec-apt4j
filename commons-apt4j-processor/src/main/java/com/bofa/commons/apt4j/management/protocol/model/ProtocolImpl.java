@@ -1,6 +1,6 @@
 package com.bofa.commons.apt4j.management.protocol.model;
 
-import com.bofa.commons.apt4j.management.internal.model.TypeHead;
+import com.bofa.commons.apt4j.management.internal.model.TypeHeadModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import com.bofa.commons.apt4j.management.protocol.model.decode.ProtocolDecode$0;
 import com.bofa.commons.apt4j.management.protocol.model.decode.ProtocolDecode$1;
@@ -23,14 +23,14 @@ import java.util.*;
 public class ProtocolImpl extends JavaModelWritable {
 
     private String package_name;
-    private TypeHead type_head;
+    private TypeHeadModel type_head;
     private ProtocolDecode$0 decode_root_element;
     private List<ProtocolDecode$1> decode_elements;
     private ProtocolEncode$0 encode_root_element;
     private List<ProtocolEncode$1> encode_elements;
     private List<JavaModelWritable> common_methods;
 
-    public ProtocolImpl(String package_name, TypeHead type_head, ProtocolDecode$0 decode_root_element, List<ProtocolDecode$1> decode_elements, ProtocolEncode$0 encode_root_element, List<ProtocolEncode$1> encode_elements, List<JavaModelWritable> common_methods) {
+    public ProtocolImpl(String package_name, TypeHeadModel type_head, ProtocolDecode$0 decode_root_element, List<ProtocolDecode$1> decode_elements, ProtocolEncode$0 encode_root_element, List<ProtocolEncode$1> encode_elements, List<JavaModelWritable> common_methods) {
         this.package_name = package_name;
         this.type_head = type_head;
         this.decode_root_element = decode_root_element;
@@ -40,7 +40,7 @@ public class ProtocolImpl extends JavaModelWritable {
         this.common_methods = common_methods;
     }
 
-    public ProtocolImpl(String package_name, TypeHead type_head) {
+    public ProtocolImpl(String package_name, TypeHeadModel type_head) {
         this(package_name, type_head, null, null, null, null, null);
     }
 

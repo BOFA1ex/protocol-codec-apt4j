@@ -6,7 +6,7 @@
 
 -->
 <#macro build_logger clazz>
-    static final Logger logger = LoggerFactory.getLogger(${clazz}.class);
+    private static final Logger logger = LoggerFactory.getLogger(${clazz}.class);
 </#macro>
 <#-- @see FreeMarkerModelGenerator shareVariables -->
 <#macro info ext>

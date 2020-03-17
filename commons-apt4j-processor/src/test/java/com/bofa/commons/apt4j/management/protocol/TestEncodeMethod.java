@@ -19,11 +19,11 @@ public class TestEncodeMethod {
 
     @Test
     public void testEncodeOverrideMethod(){
-        MethodParameter m1 = new MethodParameter(new Type("FlvFile"), "flvFile");
-        MethodParameter m2 = new MethodParameter(new Type("Channel"), "channel");
-        MethodHead methodHead = MethodHead.builder()
-                .modifier(MethodHead.PRIVATE_FINAL)
-                .return_type(new Type("ByteBuf"))
+        MethodParameterModel m1 = new MethodParameterModel(new TypeModel("FlvFile"), "flvFile");
+        MethodParameterModel m2 = new MethodParameterModel(new TypeModel("Channel"), "channel");
+        MethodHeadModel methodHead = MethodHeadModel.builder()
+                .modifier(MethodHeadModel.PRIVATE_FINAL)
+                .return_type(new TypeModel("ByteBuf"))
                 .method_name("encode")
                 .method_parameters(Arrays.asList(m1, m2))
                 .is_override(true)
@@ -44,7 +44,7 @@ public class TestEncodeMethod {
         final ProtocolEncode$0 protocolEncode = ProtocolEncode$0.builder()
                 .method_head(methodHead)
                 .validate_condition(initValidation)
-                .encode_type(new Type("FlvFile"))
+                .encode_type(new TypeModel("FlvFile"))
                 .encode_element_name("flvFile")
                 .encode_method_name("_d123FlvFile")
                 .encode_parameter("flvFile")
@@ -61,20 +61,20 @@ public class TestEncodeMethod {
     public void testEncodeRootObjectElement(){
         final ByteBufConvertAnonModel convertAnonModel = ByteBufConvertAnonModel.builder().build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("FlvFile"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("FlvFile"))
                         .method_name("_d123FlvFile")
                         .method_parameters(Arrays.asList(
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("buffer")
                                         .param_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("channel")
                                         .param_type(ProtocolGenerateConstant.CHANNEL_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("standardWriterIndex")
                                         .param_type(ProtocolGenerateConstant.INTEGER_TYPE)
                                         .build()
@@ -92,7 +92,7 @@ public class TestEncodeMethod {
                 .part1(ProtocolEncodePart$0.builder()
                         .convertAnonModel(convertAnonModel)
                         .channel_parameter("channel")
-                        .encode_type(new Type("FlvFile"))
+                        .encode_type(new TypeModel("FlvFile"))
                         .encode_type_name("flvFile")
                         .confused_buffer_name(null)
                         .build())
@@ -101,7 +101,7 @@ public class TestEncodeMethod {
                 .standard_writer_index_parameter("standardWriterIndex")
                 .member_mappings(new LinkedList<>())
                 .convert_model(convertAnonModel)
-                .encode_type(new Type("FlvFile"))
+                .encode_type(new TypeModel("FlvFile"))
                 .encode_element_name("flvFile")
                 .is_not_primitive(true)
                 .is_spel_object(true)
@@ -111,14 +111,14 @@ public class TestEncodeMethod {
                 .confused_standard_writer_index_name(null)
                 .build();
         Arrays.asList(
-                new InternalModelContext(new Type("String"), "signature", "_6c186Signature"),
-                new InternalModelContext(new Type("Integer"), "version", "_0d93aVersion"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsReserved", "_6a8c5TypeFlagsReserved"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
-                new InternalModelContext(new Type("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
-                new InternalModelContext(new Type("Integer"), "dataOffset", "_819a1DataOffset"),
-                new InternalModelContext(new Type("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
+                new InternalModelContext(new TypeModel("String"), "signature", "_6c186Signature"),
+                new InternalModelContext(new TypeModel("Integer"), "version", "_0d93aVersion"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved", "_6a8c5TypeFlagsReserved"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
+                new InternalModelContext(new TypeModel("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
+                new InternalModelContext(new TypeModel("Integer"), "dataOffset", "_819a1DataOffset"),
+                new InternalModelContext(new TypeModel("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
         ).forEach(_encode::addInternalModelContext);
         generator.generateModel(_encode);
     }
@@ -132,20 +132,20 @@ public class TestEncodeMethod {
                 .convert_method("AsciiConvertMethod")
                 .build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("String"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("String"))
                         .method_name("_6d186Signature")
                         .method_parameters(Arrays.asList(
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("buffer")
                                         .param_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("channel")
                                         .param_type(ProtocolGenerateConstant.CHANNEL_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("standardWriterIndex")
                                         .param_type(ProtocolGenerateConstant.INTEGER_TYPE)
                                         .build()
@@ -161,7 +161,7 @@ public class TestEncodeMethod {
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
                         .convertAnonModel(convertAnonModel)
-                        .encode_type(new Type("String"))
+                        .encode_type(new TypeModel("String"))
                         .encode_type_name("signature")
                         .channel_parameter("channel")
                         .confused_buffer_name("_7ddd3Buffer")
@@ -171,7 +171,7 @@ public class TestEncodeMethod {
                 .standard_writer_index_parameter("standardWriterIndex")
                 .member_mappings(new LinkedList<>())
                 .convert_model(convertAnonModel)
-                .encode_type(new Type("String"))
+                .encode_type(new TypeModel("String"))
                 .encode_element_name("signature")
                 .is_not_primitive(false)
                 .is_spel_object(false)
@@ -191,20 +191,20 @@ public class TestEncodeMethod {
                 .parameters(new String[]{"java.util.ArrayList"})
                 .build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("List<FlvTag>"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("List<FlvTag>"))
                         .method_name("_7f295FlvTags")
                         .method_parameters(Arrays.asList(
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("buffer")
                                         .param_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("channel")
                                         .param_type(ProtocolGenerateConstant.CHANNEL_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("standardWriterIndex")
                                         .param_type(ProtocolGenerateConstant.INTEGER_TYPE)
                                         .build()
@@ -223,14 +223,14 @@ public class TestEncodeMethod {
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
                         .convertAnonModel(convertAnonModel)
-                        .encode_type(new Type("List<FlvTag>"))
+                        .encode_type(new TypeModel("List<FlvTag>"))
                         .encode_type_name("flvTags")
                         .channel_parameter("channel")
                         .confused_buffer_name("_ef449Buffer")
                         .build())
                 .member_mappings(new LinkedList<>())
                 .convert_model(convertAnonModel)
-                .encode_type(new Type("List<FlvTag>"))
+                .encode_type(new TypeModel("List<FlvTag>"))
                 .encode_element_name("flvTags")
                 .is_not_primitive(true)
                 .is_spel_object(false)
@@ -240,7 +240,7 @@ public class TestEncodeMethod {
                 .confused_standard_writer_index_name("_13f07StandardWriterIndex")
                 .build();
         _encode.addInternalModelContext(
-                new InternalModelContext(new Type("FlvTag"), "flvTag", "_fg9baFlvTag")
+                new InternalModelContext(new TypeModel("FlvTag"), "flvTag", "_fg9baFlvTag")
         );
         generator.generateModel(_encode);
     }
@@ -254,24 +254,24 @@ public class TestEncodeMethod {
                 .convert_method(null)
                 .build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
                         .return_type(ProtocolGenerateConstant.VOID_TYPE)
                         .method_name("_94d67FlvAudioTagBody")
                         .method_parameters(Arrays.asList(
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("buffer")
                                         .param_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("flvAudioTagBody")
-                                        .param_type(new Type("FlvAudioTagBody"))
+                                        .param_type(new TypeModel("FlvAudioTagBody"))
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("channel")
                                         .param_type(ProtocolGenerateConstant.CHANNEL_TYPE)
                                         .build(),
-                                MethodParameter.builder()
+                                MethodParameterModel.builder()
                                         .param_name("standardWriterIndex")
                                         .param_type(ProtocolGenerateConstant.INTEGER_TYPE)
                                         .build()
@@ -287,7 +287,7 @@ public class TestEncodeMethod {
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
                         .convertAnonModel(convertAnonModel)
-                        .encode_type(new Type("FlvAudioTagBody"))
+                        .encode_type(new TypeModel("FlvAudioTagBody"))
                         .encode_type_name("flvAudioTagBody")
                         .channel_parameter("channel")
                         .confused_buffer_name("_8e7f9Buffer")
@@ -297,7 +297,7 @@ public class TestEncodeMethod {
                 .standard_writer_index_parameter("standardWriterIndex")
                 .member_mappings(new LinkedList<>())
                 .convert_model(convertAnonModel)
-                .encode_type(new Type("FlvAudioTagBody"))
+                .encode_type(new TypeModel("FlvAudioTagBody"))
                 .encode_element_name("flvAudioTagBody")
                 .is_not_primitive(true)
                 .is_spel_object(true)
@@ -307,7 +307,7 @@ public class TestEncodeMethod {
                 .confused_standard_writer_index_name("_cfca7StandardWriterIndex")
                 .build();
         _encode.addInternalModelContext(
-                new InternalModelContext(new Type("Integer"), "soundFormat", "_8acfbSoundFormat")
+                new InternalModelContext(new TypeModel("Integer"), "soundFormat", "_8acfbSoundFormat")
         );
         generator.generateModel(_encode);
     }

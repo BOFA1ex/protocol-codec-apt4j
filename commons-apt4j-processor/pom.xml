@@ -41,10 +41,8 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.12</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -58,7 +56,9 @@
                         <arg>-parameters</arg>
                         <arg>-verbose</arg>
                         <arg>-processor</arg>
-                        <arg>lombok.launch.AnnotationProcessorHider$AnnotationProcessor,lombok.launch.AnnotationProcessorHider$ClaimingProcessor</arg>
+                        <arg>
+                            lombok.launch.AnnotationProcessorHider$AnnotationProcessor,lombok.launch.AnnotationProcessorHider$ClaimingProcessor
+                        </arg>
 <!--                        <arg>-proc:none</arg>-->
 <!--                        <arg>-Xlint:all,-options,-path</arg>-->
                     </compilerArgs>

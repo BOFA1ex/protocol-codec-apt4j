@@ -7,6 +7,7 @@
 -->
 <#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.ProtocolImpl" -->
 <#import "../../internal/lib/ModelBuilder.ftl" as builder/>
+<#import "../../internal/lib/Log.ftl" as logger/>
 package ${package_name};
 
 <#list import_stats as import_stat>
@@ -14,7 +15,14 @@ import ${import_stat};
 </#list>
 
 ${javadoc()}
+<#if useComponent>
+@Component
+</#if>
 <@builder.build_type_head type_head>
+
+    <#if useLogback>
+        <@logger.build_logger type_head.class_type.type_name/>
+    </#if>
     <#if encode_root_element??>
         <@includeModel object=encode_root_element/>
     </#if>
