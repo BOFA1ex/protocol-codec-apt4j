@@ -11,7 +11,7 @@ import java.lang.annotation.*;
  * @date 2020/1/7
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Protocol {
 
