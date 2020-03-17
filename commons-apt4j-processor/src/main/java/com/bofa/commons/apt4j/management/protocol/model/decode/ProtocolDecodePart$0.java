@@ -1,6 +1,6 @@
 package com.bofa.commons.apt4j.management.protocol.model.decode;
 
-import com.bofa.commons.apt4j.management.internal.model.Type;
+import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import com.bofa.commons.apt4j.management.protocol.model.common.ByteBufConvertAnonModel;
 import com.google.common.collect.Sets;
@@ -20,7 +20,7 @@ import java.util.Set;
 public class ProtocolDecodePart$0 extends JavaModelWritable {
 
     private ByteBufConvertAnonModel convertAnonModel;
-    private Type decode_type;
+    private TypeModel decode_type;
     private String decode_type_name;
     private String channel_parameter;
     private String confused_buffer_name;

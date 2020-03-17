@@ -1,7 +1,7 @@
 package com.bofa.commons.apt4j.management.protocol.model.encode;
 
-import com.bofa.commons.apt4j.management.internal.model.MethodHead;
-import com.bofa.commons.apt4j.management.internal.model.Type;
+import com.bofa.commons.apt4j.management.internal.model.MethodHeadModel;
+import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import com.bofa.commons.apt4j.management.protocol.model.common.InitBuffer;
 import com.bofa.commons.apt4j.management.protocol.model.common.InitValidation;
@@ -20,9 +20,9 @@ import java.util.Set;
 @Builder
 public class ProtocolEncode$0 extends JavaModelWritable {
 
-    private MethodHead method_head;
+    private MethodHeadModel method_head;
 
-    private Type encode_type;
+    private TypeModel encode_type;
     private String encode_element_name;
     private String encode_method_name;
 

@@ -14,12 +14,12 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class MethodParameter extends JavaModelWritable {
+public class MethodParameterModel extends JavaModelWritable {
 
-    private Type param_type;
+    private TypeModel param_type;
     private String param_name;
 
-    public MethodParameter(Type param_type, String param_name) {
+    public MethodParameterModel(TypeModel param_type, String param_name) {
         this.param_type = param_type;
         this.param_name = param_name;
     }

@@ -1,7 +1,7 @@
 package com.bofa.commons.apt4j.management.protocol.model.decode;
 
-import com.bofa.commons.apt4j.management.internal.model.MethodHead;
-import com.bofa.commons.apt4j.management.internal.model.Type;
+import com.bofa.commons.apt4j.management.internal.model.MethodHeadModel;
+import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import com.bofa.commons.apt4j.management.protocol.model.common.*;
 import lombok.*;
@@ -20,7 +20,7 @@ import java.util.*;
 public class ProtocolDecode$1 extends JavaModelWritable {
 
     /* method-head */
-    private MethodHead method_head;
+    private MethodHeadModel method_head;
     /* parameters */
     private String buffer_parameter;
     private String channel_parameter;
@@ -31,7 +31,7 @@ public class ProtocolDecode$1 extends JavaModelWritable {
     private ProtocolSpelProcessExpr part0;
     private ProtocolDecodePart$0 part1;
     /* 待解析对象类型名 */
-    private Type decode_type;
+    private TypeModel decode_type;
     private String decode_element_name;
     /** 待解析对象类型 */
     private boolean is_not_primitive;

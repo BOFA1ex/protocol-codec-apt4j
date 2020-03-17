@@ -1,7 +1,7 @@
 package com.bofa.commons.apt4j.management.protocol.constant;
 
 
-import com.bofa.commons.apt4j.management.internal.model.Type;
+import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 
 /**
  * @author bofa1ex
@@ -36,13 +36,13 @@ public interface ProtocolGenerateConstant {
     String OBJECT_TYPE_NAME = "Object";
     String OBJECT_QUALIFIER_NAME = "java.lang.Object";
 
-    Type CHANNEL_UTILS_TYPE = new Type(CHANNEL_UTILS_TYPE_NAME, CHANNEL_UTILS_QUALIFIER_NAME);
-    Type BYTEBUF_TYPE = new Type(BYTEBUF_TYPE_NAME, BYTEBUF_QUALIFIER_NAME);
-    Type CHANNEL_TYPE = new Type(CHANNEL_TYPE_NAME, CHANNEL_QUALIFIER_NAME);
-    Type INTEGER_TYPE = new Type("Integer", "java.lang.Integer");
-    Type STRING_TYPE = new Type("String", "java.lang.String");
-    Type OBJECT_TYPE = new Type(OBJECT_TYPE_NAME, OBJECT_QUALIFIER_NAME);
-    Type VOID_TYPE = new Type("void", "void");
+    TypeModel CHANNEL_UTILS_TYPE = new TypeModel(CHANNEL_UTILS_TYPE_NAME, CHANNEL_UTILS_QUALIFIER_NAME);
+    TypeModel BYTEBUF_TYPE = new TypeModel(BYTEBUF_TYPE_NAME, BYTEBUF_QUALIFIER_NAME);
+    TypeModel CHANNEL_TYPE = new TypeModel(CHANNEL_TYPE_NAME, CHANNEL_QUALIFIER_NAME);
+    TypeModel INTEGER_TYPE = new TypeModel("Integer", "java.lang.Integer");
+    TypeModel STRING_TYPE = new TypeModel("String", "java.lang.String");
+    TypeModel OBJECT_TYPE = new TypeModel(OBJECT_TYPE_NAME, OBJECT_QUALIFIER_NAME);
+    TypeModel VOID_TYPE = new TypeModel("void", "void");
 
 //    Type INTEGER_TYPE = new Type("Integer","java.lang.Integer");
 //    Type INTEGER_TYPE = new Type("Integer","java.lang.Integer");

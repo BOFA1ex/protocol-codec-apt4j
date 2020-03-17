@@ -29,15 +29,15 @@ public class TestCommonMethod {
     @Test
     public void testInitChannelSpelContextMethod() {
         InitChannelSpelContextMethod initBuffer = InitChannelSpelContextMethod.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("void"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("void"))
                         .method_name("_init")
                         .method_parameters(Arrays.asList(
-                                new MethodParameter(new Type("String"), "objName"),
-                                new MethodParameter(new Type("Object"), "obj"),
-                                new MethodParameter(new Type("ByteBuf"), "buffer"),
-                                new MethodParameter(new Type("Channel"), "channel")
+                                new MethodParameterModel(new TypeModel("String"), "objName"),
+                                new MethodParameterModel(new TypeModel("Object"), "obj"),
+                                new MethodParameterModel(new TypeModel("ByteBuf"), "buffer"),
+                                new MethodParameterModel(new TypeModel("Channel"), "channel")
                         ))
                         .is_override(false)
                         .build()
@@ -52,14 +52,14 @@ public class TestCommonMethod {
     @Test
     public void testInitMarkAndReadSliceMethod() {
         InitMarkAndReadSliceMethod initBuffer = InitMarkAndReadSliceMethod.builder()
-                .method_head(MethodHead.builder()
-                        .modifier(MethodHead.PRIVATE_FINAL)
-                        .return_type(new Type("ByteBuf"))
+                .method_head(MethodHeadModel.builder()
+                        .modifier(MethodHeadModel.PRIVATE_FINAL)
+                        .return_type(new TypeModel("ByteBuf"))
                         .method_name("markAndReadSlice")
                         .method_parameters(Arrays.asList(
-                                new MethodParameter(new Type("ByteBuf"), "buffer"),
-                                new MethodParameter(new Type("int"), "index"),
-                                new MethodParameter(new Type("int"), "length")
+                                new MethodParameterModel(new TypeModel("ByteBuf"), "buffer"),
+                                new MethodParameterModel(new TypeModel("int"), "index"),
+                                new MethodParameterModel(new TypeModel("int"), "length")
                         ))
                         .is_override(false)
                         .build())

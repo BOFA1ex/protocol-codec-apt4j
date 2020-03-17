@@ -19,7 +19,7 @@ import java.util.*;
 public class ProtocolEncode$1 extends JavaModelWritable {
 
     /* method-head */
-    private MethodHead method_head;
+    private MethodHeadModel method_head;
     /* parameters */
     private String buffer_parameter;
     private String channel_parameter;
@@ -30,7 +30,7 @@ public class ProtocolEncode$1 extends JavaModelWritable {
     private ProtocolSpelProcessExpr part0;
     private ProtocolEncodePart$0 part1;
     /* 待解析对象类型名 */
-    private Type encode_type;
+    private TypeModel encode_type;
     private String encode_element_name;
     /** 待解析对象类型 */
     private boolean is_not_primitive;

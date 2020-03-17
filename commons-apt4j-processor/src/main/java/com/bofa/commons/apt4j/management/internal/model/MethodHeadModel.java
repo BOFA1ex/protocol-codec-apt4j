@@ -15,14 +15,14 @@ import java.util.*;
 @Getter
 @Setter
 @Builder
-public class MethodHead extends JavaModelWritable {
+public class MethodHeadModel extends JavaModelWritable {
 
     public static final String PRIVATE_FINAL = "private final";
 
     private String modifier;
-    private Type return_type;
+    private TypeModel return_type;
     private String method_name;
-    private List<MethodParameter> method_parameters;
+    private List<MethodParameterModel> method_parameters;
 
     private boolean is_override;
 
@@ -31,7 +31,7 @@ public class MethodHead extends JavaModelWritable {
     }
 
     public Set<String> getImport_stats() {
-        for (final MethodParameter method_parameter : method_parameters) {
+        for (final MethodParameterModel method_parameter : method_parameters) {
             import_stats.addAll(method_parameter.getImport_stats());
         }
         return import_stats;

@@ -1,6 +1,6 @@
 package com.bofa.commons.apt4j.management.protocol.model.common;
 
-import com.bofa.commons.apt4j.management.internal.model.MethodHead;
+import com.bofa.commons.apt4j.management.internal.model.MethodHeadModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import lombok.*;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 @Builder
 public class InitChannelSpelContextMethod extends JavaModelWritable {
 
-    private MethodHead method_head;
+    private MethodHeadModel method_head;
     private List<SpelVarModel> spel_vars;
 
     @Getter

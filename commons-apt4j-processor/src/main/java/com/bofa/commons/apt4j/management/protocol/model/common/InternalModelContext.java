@@ -1,6 +1,6 @@
 package com.bofa.commons.apt4j.management.protocol.model.common;
 
-import com.bofa.commons.apt4j.management.internal.model.Type;
+import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,11 +15,11 @@ import java.util.Set;
 @Setter
 public class InternalModelContext extends JavaModelWritable {
 
-    private Type member_type;
+    private TypeModel member_type;
     private String member_name;
     private String member_method_name;
 
-    public InternalModelContext(Type member_type, String member_name, String member_method_name) {
+    public InternalModelContext(TypeModel member_type, String member_name, String member_method_name) {
         this.member_type = member_type;
         this.member_name = member_name;
         this.member_method_name = member_method_name;
