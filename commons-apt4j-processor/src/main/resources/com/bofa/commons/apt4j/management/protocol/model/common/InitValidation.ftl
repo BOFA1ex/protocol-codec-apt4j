@@ -14,12 +14,13 @@
             ${validate_simple_name}.INSTANCE.validate(${buffer_parameter}, ${channel_parameter},
         </#if>
     <#else>
-        <#if useComponent>
-            ${validate_simple_name?uncap_first}.mapper(${buffer_parameter}, ${channel_parameter},
-        <#else>
-            ${validate_simple_name}.INSTANCE.mapper(${buffer_parameter}, ${channel_parameter},
-        </#if>
-
+        try {
+            ${buffer_parameter}.markWriterIndex();
+            <#if useComponent>
+                ${validate_simple_name?uncap_first}.mapper(${buffer_parameter}, ${channel_parameter},
+            <#else>
+                ${validate_simple_name}.INSTANCE.mapper(${buffer_parameter}, ${channel_parameter},
+            </#if>
     </#if>
     "${validate_index}",
     "${validate_length}",
@@ -29,5 +30,10 @@
         <#if anon_params?? && anon_params?has_content>, <#list anon_params as anon_param>"${anon_param}"<#if anon_param_has_next>, </#if></#list></#if>
     </@compress>
     <#lt>);
+    <#if !is_validate()>
+        } finally {
+            ${buffer_parameter}.resetWriterIndex();
+        }
+    </#if>
 </@compress>
 

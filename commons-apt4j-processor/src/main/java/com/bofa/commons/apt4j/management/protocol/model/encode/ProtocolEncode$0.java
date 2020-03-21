@@ -7,6 +7,7 @@ import com.bofa.commons.apt4j.management.protocol.model.common.InitBuffer;
 import com.bofa.commons.apt4j.management.protocol.model.common.InitValidation;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,11 +31,11 @@ public class ProtocolEncode$0 extends JavaModelWritable {
     private String encode_parameter;
 
     private InitBuffer init_buffer;
-    private InitValidation validate_condition;
+    private List<InitValidation> init_validations;
 
-    public void setValidate_condition(InitValidation validate_condition) {
-        this.validate_condition = validate_condition;
-        super.import_stats.addAll(validate_condition.getImport_stats());
+    public void addInit_validation(InitValidation init_validation) {
+        this.init_validations.add(init_validation);
+        super.import_stats.addAll(init_validation.getImport_stats());
     }
 
     public Set<String> getStatic_import_stats() {

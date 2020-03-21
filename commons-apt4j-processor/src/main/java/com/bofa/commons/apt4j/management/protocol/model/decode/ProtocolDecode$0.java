@@ -7,6 +7,7 @@ import com.bofa.commons.apt4j.management.protocol.model.common.InitResolveExcept
 import com.bofa.commons.apt4j.management.protocol.model.common.InitValidation;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,11 +30,11 @@ public class ProtocolDecode$0 extends JavaModelWritable {
     private String buffer_parameter;
     private String channel_parameter;
 
-    private InitValidation init_validation;
+    private List<InitValidation> init_validations;
     private InitResolveException init_resolve_exception;
 
-    public void setInit_validation(InitValidation init_validation) {
-        this.init_validation = init_validation;
+    public void addInit_validation(InitValidation init_validation) {
+        this.init_validations.add(init_validation);
         super.import_stats.addAll(init_validation.getImport_stats());
     }
 

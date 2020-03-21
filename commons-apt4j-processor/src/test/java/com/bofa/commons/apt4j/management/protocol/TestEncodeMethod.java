@@ -43,7 +43,7 @@ public class TestEncodeMethod {
                 .build();
         final ProtocolEncode$0 protocolEncode = ProtocolEncode$0.builder()
                 .method_head(methodHead)
-                .validate_condition(initValidation)
+                .init_validations(Collections.singletonList(initValidation))
                 .encode_type(new TypeModel("FlvFile"))
                 .encode_element_name("flvFile")
                 .encode_method_name("_d123FlvFile")

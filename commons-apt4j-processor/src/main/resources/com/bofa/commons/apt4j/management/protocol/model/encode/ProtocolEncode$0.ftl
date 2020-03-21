@@ -12,9 +12,11 @@
     // 基准writeIndex standardWriteIndex
     final int standardWriterIndex = buffer.writerIndex();
     ${encode_method_name}(buffer, ${encode_parameter}, ${channel_parameter}, standardWriterIndex);
-    <#if validate_condition??>
+    <#if init_validations?has_content>
         // 组装校验码/混淆数据域
-        <@includeModel object=validate_condition/>
+        <#list init_validations as init_validation>
+            <@includeModel object=init_validation/>
+        </#list>
     </#if>
     return buffer;
 </@builder.build_method_head>

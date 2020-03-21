@@ -8,9 +8,11 @@
 <#import "../../../internal/lib/ModelBuilder.ftl" as builder/>
 <#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.decode.ProtocolDecode$0" -->
 <@builder.build_method_head method_head>
-    <#if init_validation??>
+    <#if init_validations?has_content>
         // 校验缓冲区报文
-        <@includeModel object=init_validation/>
+        <#list init_validations as init_validation>
+            <@includeModel object=init_validation/>
+        </#list>
     </#if>
     // 基准readerIndex standard_reader_index
     final int standard_reader_index = ${buffer_parameter}.readerIndex();

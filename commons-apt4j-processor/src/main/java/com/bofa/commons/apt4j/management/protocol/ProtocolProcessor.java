@@ -478,6 +478,8 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .encode_method_name(encodeMethodName)
                     .encode_parameter(encodeTypeParameterName)
                     .channel_parameter(encodeChannelParameterName)
+                    // 校验组需要有执行顺序, 这里用链表
+                    .init_validations(Lists.newLinkedList())
                     .method_head(MethodHeadModel.builder()
                             .modifier(modifier)
                             .return_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
@@ -651,38 +653,46 @@ public class ProtocolProcessor extends AbstractProcessor {
 
         /** inject validate operations before encode */
         private void injectValidateInOverrideEncodeMethod() {
-            final ByteBufValidation byteBufValidationAnon = encodeSymbol.getAnnotation(ByteBufValidation.class);
-            if (byteBufValidationAnon == null) {
+            final ByteBufValidationGroup validationGroup = encodeSymbol.getAnnotation(ByteBufValidationGroup.class);
+            if (validationGroup == null) {
                 return;
             }
-            final boolean isValidate = false;
-            final ByteBufValidation.Validate validate = byteBufValidationAnon.validate();
-            final String validateIndex = validate.index();
-            final String validateLength = validate.length();
-            final ByteBufValidation.Mapper mapper = byteBufValidationAnon.mapper();
-            final String mapperIndex = mapper.index();
-            final String mapperLength = mapper.length();
-            final String[] parameters = byteBufValidationAnon.parameters();
-            // validate resolve qualifier/simple
-            final String validateMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
-            final String validateMethodSimpleName = qualifierName2SimpleName(validateMethodQualifierName);
-            // 注入validateMethod到装配依赖项里
-            protocolImplModel.addAutoWire(validateMethodSimpleName);
-            final InitValidation initValidation = InitValidation.builder()
-                    .validate_qualifier_name(validateMethodQualifierName)
-                    .validate_simple_name(validateMethodSimpleName)
-                    .validate_index(validateIndex)
-                    .validate_length(validateLength)
-                    .mapper_index(mapperIndex)
-                    .mapper_length(mapperLength)
-                    // ByteBufValidation#parameters
-                    .anon_params(Arrays.asList(parameters))
-                    .buffer_parameter(DEFAULT_BUFFER_PARAMETER_NAME)
-                    .channel_parameter(encodeChannelParameterName)
-                    // validate/mapper flag
-                    .is_validate(isValidate)
-                    .build();
-            this.overrideEncode.setValidate_condition(initValidation);
+            final ByteBufValidation[] validations = validationGroup.value();
+            if (validations.length == 0) {
+                return;
+            }
+            // 根据优先级order排序执行校验
+            Arrays.stream(validations).sorted(Comparator.comparing(ByteBufValidation::order))
+                    .forEach(byteBufValidationAnon -> {
+                        final boolean isValidate = false;
+                        final ByteBufValidation.Validate validate = byteBufValidationAnon.validate();
+                        final String validateIndex = validate.index();
+                        final String validateLength = validate.length();
+                        final ByteBufValidation.Mapper mapper = byteBufValidationAnon.mapper();
+                        final String mapperIndex = mapper.index();
+                        final String mapperLength = mapper.length();
+                        final String[] parameters = byteBufValidationAnon.parameters();
+                        // validate resolve qualifier/simple
+                        final String validateMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
+                        final String validateMethodSimpleName = qualifierName2SimpleName(validateMethodQualifierName);
+                        // 注入validateMethod到装配依赖项里
+                        protocolImplModel.addAutoWire(validateMethodSimpleName);
+                        final InitValidation initValidation = InitValidation.builder()
+                                .validate_qualifier_name(validateMethodQualifierName)
+                                .validate_simple_name(validateMethodSimpleName)
+                                .validate_index(validateIndex)
+                                .validate_length(validateLength)
+                                .mapper_index(mapperIndex)
+                                .mapper_length(mapperLength)
+                                // ByteBufValidation#parameters
+                                .anon_params(Arrays.asList(parameters))
+                                .buffer_parameter(DEFAULT_BUFFER_PARAMETER_NAME)
+                                .channel_parameter(encodeChannelParameterName)
+                                // validate/mapper flag
+                                .is_validate(isValidate)
+                                .build();
+                        this.overrideEncode.addInit_validation(initValidation);
+                    });
         }
     }
 
@@ -768,6 +778,8 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .decode_method_name(decodeMethodName)
                     .buffer_parameter(decodeByteBufParameterName)
                     .channel_parameter(decodeChannelParameterName)
+                    // 校验组需要有执行顺序, 这里用链表
+                    .init_validations(Lists.newLinkedList())
                     .method_head(MethodHeadModel.builder()
                             .modifier(modifier)
                             .return_type(returnType)
@@ -937,37 +949,45 @@ public class ProtocolProcessor extends AbstractProcessor {
 
         /** inject validate operations before decode */
         private void injectValidateInOverrideDecodeMethod() {
-            final ByteBufValidation byteBufValidationAnon = methodReturnTypeElement.getAnnotation(ByteBufValidation.class);
-            if (byteBufValidationAnon == null) {
+            final ByteBufValidationGroup validationGroup = methodReturnTypeElement.getAnnotation(ByteBufValidationGroup.class);
+            if (validationGroup == null) {
                 return;
             }
-            final boolean isValidate = true;
-            final ByteBufValidation.Validate validate = byteBufValidationAnon.validate();
-            final String validateIndex = validate.index();
-            final String validateLength = validate.length();
-            final ByteBufValidation.Mapper mapper = byteBufValidationAnon.mapper();
-            final String mapperIndex = mapper.index();
-            final String mapperLength = mapper.length();
-            final String[] parameters = byteBufValidationAnon.parameters();
-            final String validateMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
-            final String validateMethodSimpleName = qualifierName2SimpleName(validateMethodQualifierName);
-            // 注入validateMethod到装配依赖项里
-            protocolImplModel.addAutoWire(validateMethodSimpleName);
-            final InitValidation initValidation = InitValidation.builder()
-                    .validate_qualifier_name(validateMethodQualifierName)
-                    .validate_simple_name(validateMethodSimpleName)
-                    .validate_index(validateIndex)
-                    .validate_length(validateLength)
-                    .mapper_index(mapperIndex)
-                    .mapper_length(mapperLength)
-                    // ByteBufValidation#parameters
-                    .anon_params(Arrays.asList(parameters))
-                    .buffer_parameter(decodeByteBufParameterName)
-                    .channel_parameter(decodeChannelParameterName)
-                    // validate/mapper flag
-                    .is_validate(isValidate)
-                    .build();
-            this.overrideDecode.setInit_validation(initValidation);
+            final ByteBufValidation[] validations = validationGroup.value();
+            if (validations.length == 0) {
+                return;
+            }
+            // 根据优先级order执行校验
+            Arrays.stream(validations).sorted(Comparator.comparing(ByteBufValidation::order))
+                    .forEach(byteBufValidationAnon -> {
+                        final boolean isValidate = true;
+                        final ByteBufValidation.Validate validate = byteBufValidationAnon.validate();
+                        final String validateIndex = validate.index();
+                        final String validateLength = validate.length();
+                        final ByteBufValidation.Mapper mapper = byteBufValidationAnon.mapper();
+                        final String mapperIndex = mapper.index();
+                        final String mapperLength = mapper.length();
+                        final String[] parameters = byteBufValidationAnon.parameters();
+                        final String validateMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
+                        final String validateMethodSimpleName = qualifierName2SimpleName(validateMethodQualifierName);
+                        // 注入validateMethod到装配依赖项里
+                        protocolImplModel.addAutoWire(validateMethodSimpleName);
+                        final InitValidation initValidation = InitValidation.builder()
+                                .validate_qualifier_name(validateMethodQualifierName)
+                                .validate_simple_name(validateMethodSimpleName)
+                                .validate_index(validateIndex)
+                                .validate_length(validateLength)
+                                .mapper_index(mapperIndex)
+                                .mapper_length(mapperLength)
+                                // ByteBufValidation#parameters
+                                .anon_params(Arrays.asList(parameters))
+                                .buffer_parameter(decodeByteBufParameterName)
+                                .channel_parameter(decodeChannelParameterName)
+                                // validate/mapper flag
+                                .is_validate(isValidate)
+                                .build();
+                        this.overrideDecode.addInit_validation(initValidation);
+                    });
         }
     }
 }

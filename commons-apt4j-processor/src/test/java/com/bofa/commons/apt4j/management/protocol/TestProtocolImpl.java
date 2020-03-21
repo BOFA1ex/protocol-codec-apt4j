@@ -7,6 +7,7 @@ import com.bofa.commons.apt4j.management.protocol.model.ProtocolImpl;
 import com.bofa.commons.apt4j.management.protocol.model.common.*;
 import com.bofa.commons.apt4j.management.protocol.model.decode.*;
 import com.bofa.commons.apt4j.management.protocol.model.encode.*;
+import com.google.common.collect.Lists;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -84,7 +85,7 @@ public class TestProtocolImpl {
                 .build();
         return ProtocolEncode$0.builder()
                 .method_head(methodHead)
-                .validate_condition(initValidation)
+                .init_validations(Collections.singletonList(initValidation))
                 .encode_type(new TypeModel("FlvFile"))
                 .encode_element_name("flvFile")
                 .encode_method_name("_d123FlvFile")
@@ -127,6 +128,7 @@ public class TestProtocolImpl {
                 .decode_method_name("_decodeFlvFile")
                 .buffer_parameter("buffer")
                 .channel_parameter("channel")
+                .init_validations(Lists.newLinkedList())
                 .init_resolve_exception(InitResolveException.builder()
                         .channel_parameter("channel")
                         .decode_element_name("flvFile")
@@ -134,7 +136,7 @@ public class TestProtocolImpl {
                         .resolve_exception_simple_name("FlvDecodeResolveExceptionMethod")
                         .build())
                 .build();
-        protocolDecode.setInit_validation(initValidation);
+        protocolDecode.addInit_validation(initValidation);
         return protocolDecode;
     }
 

@@ -7,8 +7,7 @@ import com.bofa.commons.apt4j.management.protocol.model.common.*;
 import com.bofa.commons.apt4j.management.protocol.model.decode.*;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * @author bofa1ex
@@ -106,7 +105,7 @@ public class TestDecodeMethod {
                 .build();
         ProtocolDecode$0 protocolDecode = ProtocolDecode$0.builder()
                 .method_head(methodHead)
-                .init_validation(initValidation)
+                .init_validations(Collections.singletonList(initValidation))
                 .decode_type(new TypeModel("FlvFile"))
                 .decode_element_name("flvFile")
                 .decode_method_name("_decodeFlvFile")
