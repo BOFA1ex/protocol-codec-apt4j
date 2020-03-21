@@ -9,6 +9,6 @@ import java.lang.annotation.*;
 @Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.SOURCE)
 @Documented
-@interface ByteBufValidationGroup {
+public @interface ByteBufValidationGroup {
     ByteBufValidation[] value();
 }
