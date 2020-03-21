@@ -43,6 +43,10 @@ public class ProtocolEncode$1 extends JavaModelWritable {
     private String confused_buffer_name;
     private String confused_standard_writer_index_name;
 
+    public void addAllInternalModelContext(List<InternalModelContext> internalModelContexts){
+        this.member_mappings.addAll(internalModelContexts);
+        internalModelContexts.forEach(internalModelContext -> super.import_stats.addAll(internalModelContext.getImport_stats()));
+    }
     public synchronized void addInternalModelContext(InternalModelContext internalModelContext){
         this.member_mappings.add(internalModelContext);
         super.import_stats.addAll(internalModelContext.getImport_stats());

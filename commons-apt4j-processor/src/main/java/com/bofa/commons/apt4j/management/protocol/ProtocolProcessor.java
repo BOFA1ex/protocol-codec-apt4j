@@ -11,11 +11,11 @@ import com.bofa.commons.apt4j.management.protocol.model.ProtocolImpl;
 import com.bofa.commons.apt4j.management.protocol.model.common.*;
 import com.bofa.commons.apt4j.management.protocol.model.decode.*;
 import com.bofa.commons.apt4j.management.protocol.model.encode.*;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
+import com.google.common.base.*;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.sun.tools.javac.code.Symbol;
-import com.sun.tools.javac.processing.JavacProcessingEnvironment;
-import com.sun.tools.javac.util.Context;
+import com.sun.tools.javac.code.Type;
 import lombok.*;
 
 import javax.annotation.processing.*;
@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * @author bofa1ex
@@ -41,12 +42,12 @@ public class ProtocolProcessor extends AbstractProcessor {
     private static final String LOGBACK_ENV_VARIABLE = "UseLogback";
     private static final String COMPONENT_ENV_VARIABLE = "UseComponent";
 
-    //    /* 语法树 */
-//    private Trees trees;
-//    /* 树节点创建工具类 */
-//    private TreeMaker treeMaker;
-//    /* 命名工具类 */
-//    private Names names;
+    private static final FreeMarkerModelGenerator MODEL_GENERATOR = new FreeMarkerModelGenerator();
+
+    private boolean useLogback = true;
+    private boolean useComponent = true;
+
+
     /* 打印编译日志工具 */
     private Messager messager;
     /* 处理节点工具 */
@@ -59,14 +60,12 @@ public class ProtocolProcessor extends AbstractProcessor {
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
-//        this.trees = Trees.instance(processingEnv);
-        Context ctx = ((JavacProcessingEnvironment) processingEnv).getContext();
-//        this.treeMaker = TreeMaker.instance(ctx);
-//        this.names = Names.instance(ctx);
         this.messager = processingEnv.getMessager();
         this.elementUtils = processingEnv.getElementUtils();
         this.typeUtils = processingEnv.getTypeUtils();
         this.options = processingEnv.getOptions();
+        this.useLogback = Boolean.parseBoolean(options.getOrDefault(LOGBACK_ENV_VARIABLE, "true"));
+        this.useComponent = Boolean.parseBoolean(options.getOrDefault(COMPONENT_ENV_VARIABLE, "true"));
     }
 
     @Override
@@ -116,24 +115,35 @@ public class ProtocolProcessor extends AbstractProcessor {
         final boolean needImplement = element.getKind().isInterface();
         final ProtocolImpl protocolImplModel = ProtocolImpl.builder()
                 .package_name(packageName)
+                // 类首部
                 .type_head(TypeHeadModel.builder()
                         .modifier(TypeHeadModel.DEFAULT_MODIFIER)
-                        .class_type(new TypeModel(implName, packageName + "." + implName))
+                        .impl_type(TypeModel.builder()
+                                .type_simple_name(implName)
+                                .type_qualifier_name(packageName + "." + implName)
+                                .build())
+                        // 实现的接口类型
                         .interface_type(needImplement ? new TypeModel(element) : null)
+                        // 继承的父类类型
                         .super_type(needExtends ? new TypeModel(element) : null)
                         .needExtends(needExtends)
                         .needImplement(needImplement)
                         .build())
-                .decode_elements(new ArrayList<>())
-                .encode_elements(new ArrayList<>())
-                .common_methods(new ArrayList<>())
-                .autowires(new HashSet<>())
+                // 初始化后续需要decode/encode的内部元素以及commons方法
+                .decode_elements(Lists.newArrayList())
+                .encode_elements(Lists.newArrayList())
+                .common_methods(Lists.newArrayList())
+                // 需要注入的对象(convertMethods, validationMethods, resolveException)
+                .autowires(Sets.newHashSet())
                 .build();
+
         // process logback&component options
-        final boolean useLogback = processLogbackOption(protocolImplModel);
+        processLogbackOption(protocolImplModel);
         processComponentOption(protocolImplModel);
+
         // process common methods
         ProtocolCommonProcessor.processCommonMethods(protocolImplModel, element, useLogback);
+
         element.getEnclosedElements().stream()
                 .filter(ele -> ele instanceof ExecutableElement)
                 .map(ele -> (Symbol.MethodSymbol) ele)
@@ -160,17 +170,17 @@ public class ProtocolProcessor extends AbstractProcessor {
         return protocolImplModel;
     }
 
-    boolean processLogbackOption(ProtocolImpl protocolImplModel) {
+    /** 处理logback 依赖 */
+    void processLogbackOption(ProtocolImpl protocolImplModel) {
         final String LOGGER_IMPL_TYPE_QUALIFIER_NAME = "org.slf4j.impl.StaticLoggerBinder";
-        final boolean useLogback = Boolean.parseBoolean(options.getOrDefault(LOGBACK_ENV_VARIABLE, "true"));
         if (useLogback) {
             Preconditions.checkNotNull(elementUtils.getTypeElement(LOGGER_IMPL_TYPE_QUALIFIER_NAME), "未找到logback-classic依赖包");
             protocolImplModel.getImport_stats().add("org.slf4j.*");
         }
         FreeMarkerModelGenerator.initConfigurationLogbackEnv(useLogback);
-        return useLogback;
     }
 
+    /** 处理spring-context 依赖 */
     void processComponentOption(ProtocolImpl protocolImplModel) {
         final String COMPONENT_TYPE_QUALIFIER_NAME = "org.springframework.stereotype.Component";
         final boolean useComponent = Boolean.parseBoolean(options.getOrDefault(COMPONENT_ENV_VARIABLE, "true"));
@@ -181,11 +191,12 @@ public class ProtocolProcessor extends AbstractProcessor {
         FreeMarkerModelGenerator.initConfigurationSpringComponentEnv(useComponent);
     }
 
+    /** write freeMarker models in sourceFile */
     void writeAndFlushModel(Symbol.ClassSymbol ele, ProtocolImpl protocolImpl) {
         final String javaFileSourceName = ele.getAnnotation(Protocol.class).implName();
         try {
             final JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(javaFileSourceName);
-            new FreeMarkerModelGenerator().generateModel(sourceFile, protocolImpl);
+            MODEL_GENERATOR.generateModel(sourceFile, protocolImpl);
         } catch (IOException e) {
             messager.printMessage(Diagnostic.Kind.ERROR, Arrays.toString(e.getStackTrace()));
         }
@@ -265,7 +276,7 @@ public class ProtocolProcessor extends AbstractProcessor {
         protected static final String DEFAULT_STANDARD_READER_INDEX = "standardReaderIndex";
         protected static final String DEFAULT_STANDARD_WRITER_INDEX = "standardWriterIndex";
 
-        // internal element typeEnum
+        // element typeEnum
         protected static final int PRIMITIVE = 0;
         protected static final int SPEL_OBJ = 1;
         protected static final int COLLECTION = 2;
@@ -284,9 +295,13 @@ public class ProtocolProcessor extends AbstractProcessor {
             return "_" + UUID.randomUUID().toString().replaceAll("-", "").substring(0, 5) + original;
         }
 
+        /**
+         * 处理ByteBufConvert注解中的length字段, 如果该字段的expr是对xx_buffer.readableBytes()
+         * 在encode阶段, readableBytes为writerIndex, 明显不符合要求, 缓冲区内部是可以弹性扩容的, 这里直接给定writableBytes即可
+         */
         protected static String resolveEncodeByteBufConvertAnonLength(String byteBufConvertLength) {
-            String findStr = "readableBytes";
-            String replaceStr = "writableBytes";
+            final String findStr = "readableBytes";
+            final String replaceStr = "writableBytes";
             if (byteBufConvertLength.endsWith("readableBytes()")) {
                 return byteBufConvertLength.replace(findStr, replaceStr);
             }
@@ -296,15 +311,15 @@ public class ProtocolProcessor extends AbstractProcessor {
         /**
          * 检查element的typeEnum
          */
-        protected int checkVariableElementTypeEnum(Element element) {
+        protected int checkVariableElementTypeEnum(Symbol symbol) {
             // 需要将varSymbol转classSymbol再获取SpelMapping注解
             // fix#issue3 基本类型强转包装类型
-            final Symbol.TypeSymbol classTypeElement = TypeUtils.resolvePrimitiveType(typeUtils, element.asType());
+            final Symbol.TypeSymbol classTypeElement = TypeUtils.getTypeSymbol(typeUtils, symbol.asType());
             final SpelMapping spelMappingAnon = classTypeElement.getAnnotation(SpelMapping.class);
             if (spelMappingAnon != null) {
                 return SPEL_OBJ;
             }
-            final List<com.sun.tools.javac.code.Type> typeArguments = ((Symbol.VarSymbol) element).asType().getTypeArguments();
+            final List<Type> typeArguments = symbol.asType().getTypeArguments();
             return typeArguments == null || typeArguments.size() == 0 ? PRIMITIVE : COLLECTION;
         }
 
@@ -312,15 +327,16 @@ public class ProtocolProcessor extends AbstractProcessor {
          * 校验decode返参/encode入参
          * 是否合法
          */
-        protected void requireElementModifiedBySpelMapping(Element element) {
+        protected boolean requireElementModifiedBySpelMapping(Symbol element) {
             final int typeEnum = checkVariableElementTypeEnum(element);
             if (typeEnum == PRIMITIVE) {
                 throw new RuntimeException("Decode方法返参必须被@SpelMapping修饰");
             }
             if (typeEnum == COLLECTION) {
-                final com.sun.tools.javac.code.Type genericType = ((Symbol.VarSymbol) element).asType().getTypeArguments().get(0);
-                requireElementModifiedBySpelMapping(typeUtils.asElement(genericType));
+                final Type genericType = element.asType().getTypeArguments().get(0);
+                return requireElementModifiedBySpelMapping((Symbol) typeUtils.asElement(genericType));
             }
+            return true;
         }
 
         /**
@@ -328,6 +344,7 @@ public class ProtocolProcessor extends AbstractProcessor {
          */
         protected List<Symbol.VarSymbol> getTotalVarSymbols(TypeElement typeElement) {
             List<Symbol.VarSymbol> totals = new ArrayList<>();
+            // 如果父类不为Object, 继续递归获取被ByteBufConvert注解修饰的内部元素
             if (!typeElement.getSuperclass().toString().equals(ProtocolGenerateConstant.OBJECT_QUALIFIER_NAME)) {
                 totals.addAll(getTotalVarSymbols((TypeElement) typeUtils.asElement(typeElement.getSuperclass())));
             }
@@ -340,55 +357,41 @@ public class ProtocolProcessor extends AbstractProcessor {
         }
 
         /**
-         * ProtocolEncode$1 内部元素异步递归, 父级分发完任务后需要同步等待子元素完成任务.
+         * 内部元素异步递归, 父级分发完任务后需要同步等待子元素完成任务.
          *
-         * @param typeElement 父type元素
-         * @param parent      父级model, 需要注入子级memberMapping
+         * @param symbol 父type元素
+         *
+         * @return 内部元素集合上下文
          */
-        protected void step_processInternalRecursive(TypeElement typeElement, ProtocolEncode$1 parent) {
-            final List<Symbol.VarSymbol> internalElements = getTotalVarSymbols(typeElement);
+        protected List<InternalModelContext> step_processInternalRecursive(Symbol.TypeSymbol symbol) {
+            final List<Symbol.VarSymbol> internalElements = getTotalVarSymbols((TypeElement) symbol);
             CompletableFuture<?>[] totalTasks = new CompletableFuture[internalElements.size()];
-            for (int index = 0; index < internalElements.size(); index++) {
-                Symbol.VarSymbol element = internalElements.get(index);
-                final String memberName = element.getSimpleName().toString();
-                final String memberMethodName = generateObfuscatedName(memberName);
-                // 父级需要先填充子级的上下文
-                parent.addInternalModelContext(new InternalModelContext(new TypeModel(element), memberName, memberMethodName));
-                // 异步递归
-                totalTasks[index] = CompletableFuture.runAsync(() -> step_processInternalElements(element, memberMethodName, true));
-            }
+            final List<InternalModelContext> internalModelContexts = IntStream.range(0, internalElements.size())
+                    .mapToObj(index -> {
+                        Symbol.VarSymbol element = internalElements.get(index);
+                        final String memberName = element.getSimpleName().toString();
+                        final String memberMethodName = generateObfuscatedName(memberName);
+                        final boolean unRoot = true;
+                        // 异步递归
+                        totalTasks[index] = CompletableFuture.runAsync(() -> step_processInternalElements(element, memberMethodName, unRoot));
+                        return InternalModelContext.builder()
+                                .member_method_name(memberMethodName)
+                                .member_name(memberName)
+                                .member_type(new TypeModel(element))
+                                .build();
+                    })
+                    .collect(Collectors.toList());
             // 等待欢乐时光结束
             CompletableFuture.allOf(totalTasks).join();
+            return internalModelContexts;
         }
 
-        /**
-         * ProtocolDecode$1 内部元素异步递归, 父级分发完任务后需要同步等待子元素完成任务.
-         *
-         * @param typeElement 父type元素
-         * @param parent      父级model, 需要注入子级memberMapping
-         */
-        protected void step_processInternalRecursive(TypeElement typeElement, ProtocolDecode$1 parent) {
-            final List<Symbol.VarSymbol> internalElements = getTotalVarSymbols(typeElement);
-            CompletableFuture<?>[] totalTasks = new CompletableFuture[internalElements.size()];
-            for (int index = 0; index < internalElements.size(); index++) {
-                Symbol.VarSymbol element = internalElements.get(index);
-                final String memberName = element.getSimpleName().toString();
-                final String memberDecodeMethodName = generateObfuscatedName(memberName);
-                // 父级需要先填充子级的上下文
-                parent.addInternalModelContext(new InternalModelContext(new TypeModel(element), memberName, memberDecodeMethodName));
-                // 异步递归
-                totalTasks[index] = CompletableFuture.runAsync(() -> step_processInternalElements(element, memberDecodeMethodName, true));
-            }
-            // 等待欢乐时光结束
-            CompletableFuture.allOf(totalTasks).join();
-        }
-
-        protected String qualifierName2SimpleName(String qualifierName){
+        protected String qualifierName2SimpleName(String qualifierName) {
             if (Strings.isNullOrEmpty(qualifierName)) {
                 return null;
             }
             String[] temp = qualifierName.split("\\.");
-            return temp[temp.length -1];
+            return temp[temp.length - 1];
         }
 
         protected abstract void step_processInternalElements(Symbol typeElement, String memberMethodName, boolean unRoot);
@@ -405,7 +408,7 @@ public class ProtocolProcessor extends AbstractProcessor {
         private String encodeChannelParameterName;
 
         private ExecutableElement methodElement;
-        private TypeElement encodeTypeElement;
+        private Symbol encodeSymbol;
 
         private ProtocolEncode$0 overrideEncode;
 
@@ -426,7 +429,10 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .map(variableEle -> (Symbol) variableEle)
                     // inject encodeChannelParameterName
                     .peek(variableEle -> this.setEncodeChannelParameterName(variableEle.getSimpleName().toString()))
-                    .map(variableEle -> new MethodParameterModel(new TypeModel(variableEle), variableEle.getSimpleName().toString()))
+                    .map(variableEle -> MethodParameterModel.builder()
+                            .param_name(variableEle.getSimpleName().toString())
+                            .param_type(new TypeModel(variableEle))
+                            .build())
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("接口方法定义找不到Channel参数)")));
             this.setEncodeTypeParameter(element.getParameters().stream()
@@ -434,8 +440,11 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .map(variableEle -> (Symbol) variableEle)
                     // inject encodeTypeParameterName
                     .peek(variableEle -> this.setEncodeTypeParameterName(variableEle.getSimpleName().toString()))
-                    .peek(variableEle -> this.setEncodeTypeElement((TypeElement) typeUtils.asElement(variableEle.asType())))
-                    .map(variableEle -> new MethodParameterModel(new TypeModel(variableEle), variableEle.getSimpleName().toString()))
+                    .peek(variableEle -> this.setEncodeSymbol((Symbol) typeUtils.asElement(variableEle.asType())))
+                    .map(variableEle -> MethodParameterModel.builder()
+                            .param_name(variableEle.getSimpleName().toString())
+                            .param_type(new TypeModel(variableEle))
+                            .build())
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("接口方法定义找不到<T>参数)")));
             return this;
@@ -445,37 +454,36 @@ public class ProtocolProcessor extends AbstractProcessor {
         /* 实现接口定义的encode方法 */
         public ProtocolEncodeProcessor step3_overrideEncode() {
             // 校验encodeType必须由spelMapping修饰, 或者其泛型类型由spelMapping修饰
-            requireElementModifiedBySpelMapping(encodeTypeElement);
+            requireElementModifiedBySpelMapping(encodeSymbol);
+            /* ******** 这里用spelMapping修饰的入参<T>给的value值, 直接覆盖掉encode方法入参<T>的参数名 ******** */
+            this.setEncodeTypeParameterName(encodeSymbol.getAnnotation(SpelMapping.class).value());
+
+            // ByteBufEncode Anon properties
+            final int initialCapacity = methodElement.getAnnotation(ByteBufEncode.class).initialCapacity();
+            final int maxCapacity = methodElement.getAnnotation(ByteBufEncode.class).maxCapacity();
+            final TypeModel encodeType = new TypeModel(encodeSymbol);
             final String modifier = methodElement.getModifiers().stream()
                     // 接口定义的方法 modifier默认是public abstract, 需要手动过滤abstract修饰符
                     .filter(mod -> mod != Modifier.ABSTRACT)
                     .map(Modifier::toString)
                     .collect(Collectors.joining(" "));
-
-            // ByteBufEncode Anon properties
-            final int initialCapacity = methodElement.getAnnotation(ByteBufEncode.class).initialCapacity();
-            final int maxCapacity = methodElement.getAnnotation(ByteBufEncode.class).maxCapacity();
-
-            final TypeModel encodeType = new TypeModel((Symbol) encodeTypeElement);
-            /* ******** 这里用spelMapping修饰的入参<T>给的value值, 直接覆盖掉encode方法入参<T>的参数名 ******** */
-            this.setEncodeTypeParameterName(encodeTypeElement.getAnnotation(SpelMapping.class).value());
             // 接口encode方法名
             final String methodName = methodElement.getSimpleName().toString();
             // 混淆 方法名
             final String encodeMethodName = generateObfuscatedName(encodeTypeParameterName);
             // 重写接口定义的decode方法
             this.setOverrideEncode(ProtocolEncode$0.builder()
+                    .encode_type(encodeType)
+                    .encode_element_name(encodeTypeParameterName)
+                    .encode_method_name(encodeMethodName)
+                    .encode_parameter(encodeTypeParameterName)
+                    .channel_parameter(encodeChannelParameterName)
                     .method_head(MethodHeadModel.builder()
                             .modifier(modifier)
                             .return_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                             .method_name(methodName)
                             .method_parameters(Arrays.asList(encodeTypeParameter, encodeChannelParameter))
                             .build())
-                    .encode_type(encodeType)
-                    .encode_element_name(encodeTypeParameterName)
-                    .encode_method_name(encodeMethodName)
-                    .encode_parameter(encodeTypeParameterName)
-                    .channel_parameter(encodeChannelParameterName)
                     .init_buffer(InitBuffer.builder()
                             .initial_capacity(initialCapacity + "")
                             .max_capacity(maxCapacity + "")
@@ -492,39 +500,42 @@ public class ProtocolProcessor extends AbstractProcessor {
 
         /** finally stage */
         public void step__over() {
-            final String encodeMethodName = overrideEncode.getEncode_method_name();
             final boolean isUnRoot = false;
-            step_processInternalElements((Symbol) encodeTypeElement, encodeMethodName, isUnRoot);
+            final String encodeMethodName = overrideEncode.getEncode_method_name();
+            step_processInternalElements(encodeSymbol, encodeMethodName, isUnRoot);
         }
 
         @Override
         protected void step_processInternalElements(Symbol element, String encodeMethodName, boolean unRoot) {
+            /*
+             * Note:
+             * varSymbol转classSymbol, 否则SpelMapping注解获取不到
+             * fix#issue3 基本类型强转包装类型
+             */
+            final Symbol.TypeSymbol typeSymbol = TypeUtils.getTypeSymbol(typeUtils, element.asType());
             /* *********************** Common Part ************************ */
-            // varSymbol转classSymbol, 否则SpelMapping注解获取不到
-            // fix#issue3 基本类型强转包装类型
-            final Symbol.TypeSymbol classTypeElement = TypeUtils.resolvePrimitiveType(typeUtils, element.asType());
-            // 检查element的类型(primitive/spel_obj/collection)
-            final int typeEnum = checkVariableElementTypeEnum(element);
-            boolean isSpelObj = (typeEnum == SPEL_OBJ);
-            boolean isCollection = (typeEnum == COLLECTION);
-            boolean isNotPrimitive = typeEnum != PRIMITIVE;
             String byteBufConvertModelConvertMethodQualifierName = null;
             String byteBufConvertModelConvertMethodSimpleName = null;
             String byteBufConvertModelIndex = null;
             String byteBufConvertModelLength = null;
             String byteBufConvertModelCondition = null;
             String[] byteBufConvertModelParameters = null;
-            String obfuscateBufferName = null;
             String originalStandardWriterIndex = null;
+            String obfuscateBufferName = DEFAULT_BUFFER_PARAMETER_NAME;
+            // 检查element的类型(primitive/spel_obj/collection)
+            final int typeEnum = checkVariableElementTypeEnum(element);
+            boolean isSpelObj = (typeEnum == SPEL_OBJ);
+            boolean isCollection = (typeEnum == COLLECTION);
+            boolean isNotPrimitive = typeEnum != PRIMITIVE;
             /* *********************** UnRoot Part ************************ */
             if (unRoot) {
                 // ByteBufConvert Annotation#convertMethod
                 final ByteBufConvert byteBufConvertAnon = element.getAnnotation(ByteBufConvert.class);
                 if (isCollection & byteBufConvertAnon.parameters().length == 0) {
-                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.ArrayList\"}");
+                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
                 byteBufConvertModelIndex = byteBufConvertAnon.index();
-                // 这里需要处理encode转换readableBytes=>writableBytes
+                // 这里需要处理encode转换readableBytes => writableBytes
                 byteBufConvertModelLength = resolveEncodeByteBufConvertAnonLength(byteBufConvertAnon.length());
                 byteBufConvertModelCondition = byteBufConvertAnon.condition();
                 byteBufConvertModelParameters = byteBufConvertAnon.parameters();
@@ -545,31 +556,42 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .convert_method_simple(byteBufConvertModelConvertMethodSimpleName)
                     .parameters(byteBufConvertModelParameters)
                     .build();
-            // 获取spelMapping注解的值作为encode_element_name
-            String originalEncodeElementName = isSpelObj ? classTypeElement.getAnnotation(SpelMapping.class).value() : element.getSimpleName().toString();
+            // 如果该元素是spelObject, 则获取spelMapping注解的值作为encode_element_name
+            final String encodeElementName = isSpelObj ? typeSymbol.getAnnotation(SpelMapping.class).value() : element.getSimpleName().toString();
+            /*
+             * Note:
+             * fix#issue3 这里不能放基本类型作为入参, 必须是包装类型
+             * 如果是基本类型就放包装类型, 由于集合类型考虑到泛型擦除, 不能使用typeSymbol, 只能用varSymbol
+             */
+            final TypeModel encodeTypeModel = new TypeModel(element.asType().getKind().isPrimitive() ? typeSymbol : element);
             final ProtocolEncode$1 protocolEncode$1 = ProtocolEncode$1.builder()
+                    // 方法首部
                     .method_head(MethodHeadModel.builder()
                             .modifier(MethodHeadModel.PRIVATE_FINAL)
+                            // 返参
                             .return_type(ProtocolGenerateConstant.VOID_TYPE)
                             .method_name(encodeMethodName)
+                            .is_override(false)
+                            // 入参
                             .method_parameters(Arrays.asList(
+                                    // ByteBuf
                                     MethodParameterModel.builder()
                                             .param_name(DEFAULT_BUFFER_PARAMETER_NAME)
                                             .param_type(ProtocolGenerateConstant.BYTEBUF_TYPE)
                                             .build(),
+                                    // <T>
                                     MethodParameterModel.builder()
-                                            .param_name(originalEncodeElementName)
-                                            // fix#issue3 这里不能放基本类型作为入参, 必须是包装类型
-                                            // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
-                                            .param_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
+                                            .param_name(encodeElementName)
+                                            .param_type(encodeTypeModel)
                                             .build(),
+                                    // channel
                                     encodeChannelParameter,
+                                    // standardWriterIndex
                                     MethodParameterModel.builder()
                                             .param_name(DEFAULT_STANDARD_WRITER_INDEX)
                                             .param_type(ProtocolGenerateConstant.INTEGER_TYPE)
                                             .build()
                             ))
-                            .is_override(false)
                             .build())
                     // index, condition, length 获取缓冲区的解析部分
                     .part0(ProtocolSpelProcessExpr.builder()
@@ -581,11 +603,9 @@ public class ProtocolProcessor extends AbstractProcessor {
                     // convertMethod 不为空的解析部分
                     .part1(ProtocolEncodePart$0.builder()
                             .convert_anon_model(convertAnonModel)
-                            // fix#issue3 这里不能放基本类型作为encode_type, 必须是包装类型
-                            // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
-                            .encode_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
+                            .encode_type(encodeTypeModel)
                             .channel_parameter(encodeChannelParameterName)
-                            .encode_type_name(originalEncodeElementName)
+                            .encode_element_name(encodeElementName)
                             .confused_buffer_name(obfuscateBufferName)
                             .build())
                     // parameters
@@ -593,12 +613,10 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .channel_parameter(encodeChannelParameterName)
                     .standard_writer_index_parameter(DEFAULT_STANDARD_WRITER_INDEX)
                     // member mappings
-                    .member_mappings(new LinkedList<>())
+                    .member_mappings(Lists.newLinkedList())
                     .convert_model(convertAnonModel)
-                    //fix#issue3 这里不能放基本类型作为encode_type, 必须是包装类型
-                    // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
-                    .encode_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
-                    .encode_element_name(originalEncodeElementName)
+                    .encode_type(encodeTypeModel)
+                    .encode_element_name(encodeElementName)
                     // judgement
                     .is_not_primitive(isNotPrimitive)
                     .is_spel_object(isSpelObj)
@@ -610,19 +628,21 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .build();
             // spel元素或者集合元素内部元素遍历递归
             if (typeEnum == SPEL_OBJ) {
-                step_processInternalRecursive((TypeElement) typeUtils.asElement(element.asType()), protocolEncode$1);
+                protocolEncode$1.addAllInternalModelContext(step_processInternalRecursive(typeSymbol));
             }
             if (typeEnum == COLLECTION) {
                 // 获取集合元素的泛型元素
                 final Element genericElement = ElementUtils.getGenericElement(typeUtils, element);
-                final Symbol genericClassElement = (Symbol) typeUtils.asElement(genericElement.asType());
+                final Symbol genericClassElement = TypeUtils.getTypeSymbol(typeUtils, genericElement.asType());
                 // 生成泛型encode的混淆名
                 final String genericEncodeMethodName = generateObfuscatedName(genericElement.getSimpleName().toString());
                 // 把泛型注入到集合元素的memberMapping中
-                protocolEncode$1.addInternalModelContext(new InternalModelContext(
-                        new TypeModel(genericClassElement),
-                        genericElement.getSimpleName().toString(), genericEncodeMethodName
-                ));
+                protocolEncode$1.addInternalModelContext(InternalModelContext.builder()
+                        .member_method_name(genericEncodeMethodName)
+                        .member_name(ElementUtils.getSymbolTypeSimpleName(genericClassElement))
+                        .member_type(new TypeModel(genericClassElement))
+                        .build()
+                );
                 step_processInternalElements(genericClassElement, genericEncodeMethodName, false);
             }
             protocolImplModel.addEncodeElement(protocolEncode$1);
@@ -631,7 +651,7 @@ public class ProtocolProcessor extends AbstractProcessor {
 
         /** inject validate operations before encode */
         private void injectValidateInOverrideEncodeMethod() {
-            final ByteBufValidation byteBufValidationAnon = encodeTypeElement.getAnnotation(ByteBufValidation.class);
+            final ByteBufValidation byteBufValidationAnon = encodeSymbol.getAnnotation(ByteBufValidation.class);
             if (byteBufValidationAnon == null) {
                 return;
             }
@@ -675,7 +695,7 @@ public class ProtocolProcessor extends AbstractProcessor {
         private String decodeChannelParameterName;
 
         private ExecutableElement methodElement;
-        private TypeElement methodReturnTypeElement;
+        private Symbol methodReturnTypeElement;
 
         private ProtocolDecode$0 overrideDecode;
 
@@ -691,7 +711,7 @@ public class ProtocolProcessor extends AbstractProcessor {
         public ProtocolDecodeProcessor step2_prepareCache(ExecutableElement element, ProtocolImpl protocolImplModel) {
             this.setMethodElement(element);
             this.setProtocolImplModel(protocolImplModel);
-            this.setMethodReturnTypeElement((TypeElement) typeUtils.asElement(element.getReturnType()));
+            this.setMethodReturnTypeElement(TypeUtils.getTypeSymbol(typeUtils, element.getReturnType()));
             this.setDecodeChannelParameter(element.getParameters().stream()
                     // VariableElement 强转 Symbol
                     .map(variableEle -> (Symbol) variableEle)
@@ -700,7 +720,10 @@ public class ProtocolProcessor extends AbstractProcessor {
                     // inject decodeChannelParameterName
                     .peek(variableEle -> this.setDecodeChannelParameterName(variableEle.getSimpleName().toString()))
                     // generate MethodParameterModel
-                    .map(variableEle -> new MethodParameterModel(new TypeModel(variableEle), variableEle.getSimpleName().toString()))
+                    .map(variableEle -> MethodParameterModel.builder()
+                            .param_name(variableEle.getSimpleName().toString())
+                            .param_type(new TypeModel(variableEle))
+                            .build())
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("接口方法定义找不到Channel参数)")));
             this.setDecodeByteBufParameter(element.getParameters().stream()
@@ -708,7 +731,10 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .map(variableEle -> (Symbol) variableEle)
                     // inject decodeByteBufParameterName
                     .peek(variableEle -> this.setDecodeByteBufParameterName(variableEle.getSimpleName().toString()))
-                    .map(variableEle -> new MethodParameterModel(new TypeModel(variableEle), variableEle.getSimpleName().toString()))
+                    .map(variableEle -> MethodParameterModel.builder()
+                            .param_name(variableEle.getSimpleName().toString())
+                            .param_type(new TypeModel(variableEle))
+                            .build())
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("接口方法定义找不到ByteBuf参数)")));
             return this;
@@ -719,39 +745,39 @@ public class ProtocolProcessor extends AbstractProcessor {
             // 校验returnType必须由spelMapping修饰, 或者其泛型类型由spelMapping修饰
             requireElementModifiedBySpelMapping(methodReturnTypeElement);
             // ByteBufDecode Anon properties
-            // resolve exception qualifer/simple
+            // resolve exception
             final String resolveExceptionTypeQualifierName = TypeUtils.resolveClassTypeMirrorException(() -> methodElement.getAnnotation(ByteBufDecode.class).resolveException());
             final String resolveExceptionTypeSimpleName = qualifierName2SimpleName(resolveExceptionTypeQualifierName);
             protocolImplModel.addAutoWire(resolveExceptionTypeSimpleName);
+
+            final TypeModel returnType = new TypeModel(methodReturnTypeElement);
+            final String returnTypeElementSimpleName = methodReturnTypeElement.getAnnotation(SpelMapping.class).value();
             final String modifier = methodElement.getModifiers().stream()
                     // 接口定义的方法 modifier默认是public abstract, 需要手动过滤abstract修饰符
                     .filter(mod -> mod != Modifier.ABSTRACT)
                     .map(Modifier::toString)
                     .collect(Collectors.joining(" "));
-            final TypeModel returnType = new TypeModel((Symbol) methodReturnTypeElement);
-            final String returnTypeElementSimpleName = methodReturnTypeElement.getAnnotation(SpelMapping.class).value();
             // 接口decode方法名
             final String methodName = methodElement.getSimpleName().toString();
             // 混淆 方法名
             final String decodeMethodName = generateObfuscatedName(returnTypeElementSimpleName);
             // 重写接口定义的decode方法
             this.setOverrideDecode(ProtocolDecode$0.builder()
+                    .decode_type(returnType)
+                    .decode_element_name(returnTypeElementSimpleName)
+                    .decode_method_name(decodeMethodName)
+                    .buffer_parameter(decodeByteBufParameterName)
+                    .channel_parameter(decodeChannelParameterName)
                     .method_head(MethodHeadModel.builder()
                             .modifier(modifier)
                             .return_type(returnType)
                             .method_name(methodName)
                             .method_parameters(Arrays.asList(decodeByteBufParameter, decodeChannelParameter))
                             .build())
-                    .decode_type(returnType)
-                    .decode_element_name(returnTypeElementSimpleName)
-                    .decode_method_name(decodeMethodName)
-                    .buffer_parameter(decodeByteBufParameterName)
-                    .channel_parameter(decodeChannelParameterName)
                     .build()
             );
             // inject validation condition in ProtocolDecode$0
             injectValidateInOverrideDecodeMethod();
-            // inject resolve exception in ProtocolDecode$0
             InitResolveException initResolveException = InitResolveException.builder()
                     .decode_type(returnType)
                     .decode_element_name(returnTypeElementSimpleName)
@@ -759,6 +785,7 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .resolve_exception_qualifier_name(resolveExceptionTypeQualifierName)
                     .resolve_exception_simple_name(resolveExceptionTypeSimpleName)
                     .build();
+            // inject resolve exception in ProtocolDecode$0
             this.overrideDecode.setInit_resolve_exception(initResolveException);
             // inject ProtocolDecode$0 in protocolImplModel
             this.protocolImplModel.setDecode_root_element(overrideDecode);
@@ -770,34 +797,37 @@ public class ProtocolProcessor extends AbstractProcessor {
         public void step__over() {
             final String decodeMethodName = overrideDecode.getDecode_method_name();
             final boolean isUnRoot = false;
-            step_processInternalElements((Symbol) methodReturnTypeElement, decodeMethodName, isUnRoot);
+            step_processInternalElements(methodReturnTypeElement, decodeMethodName, isUnRoot);
         }
 
         @Override
         protected void step_processInternalElements(Symbol element, String decodeMethodName, boolean unRoot) {
+            /*
+             * Note:
+             * varSymbol转classSymbol, 否则SpelMapping注解获取不到
+             * fix#issue3 基本类型强转包装类型
+             */
+            final Symbol.TypeSymbol typeSymbol = TypeUtils.getTypeSymbol(typeUtils, element.asType());
             /* *********************** Common Part ************************ */
-            // varSymbol转classSymbol, 否则SpelMapping注解获取不到
-            // fix#issue3 基本类型强转包装类型
-            final Symbol.TypeSymbol classTypeElement = TypeUtils.resolvePrimitiveType(typeUtils, element.asType());
-            // 检查element的类型(primitive/spel_obj/collection)
-            final int typeEnum = checkVariableElementTypeEnum(element);
-            boolean isSpelObj = (typeEnum == SPEL_OBJ);
-            boolean isCollection = (typeEnum == COLLECTION);
-            boolean isNotPrimitive = typeEnum != PRIMITIVE;
             String byteBufConvertModelConvertMethodQualifierName = null;
             String byteBufConvertModelConvertMethodSimpleName = null;
             String byteBufConvertModelIndex = null;
             String byteBufConvertModelLength = null;
             String byteBufConvertModelCondition = null;
             String[] byteBufConvertModelParameters = null;
-            String obfuscateBufferName = null;
             String originalStandardReaderIndex = null;
+            String obfuscateBufferName = decodeByteBufParameterName;
+            // 检查element的类型(primitive/spel_obj/collection)
+            final int typeEnum = checkVariableElementTypeEnum(element);
+            boolean isSpelObj = (typeEnum == SPEL_OBJ);
+            boolean isCollection = (typeEnum == COLLECTION);
+            boolean isNotPrimitive = typeEnum != PRIMITIVE;
             /* *********************** UnRoot Part ************************ */
             if (unRoot) {
                 // ByteBufConvert Annotation#convertMethod
                 final ByteBufConvert byteBufConvertAnon = element.getAnnotation(ByteBufConvert.class);
                 if (isCollection & byteBufConvertAnon.parameters().length == 0) {
-                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.ArrayList\"}");
+                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
                 byteBufConvertModelIndex = byteBufConvertAnon.index();
                 byteBufConvertModelLength = byteBufConvertAnon.length();
@@ -813,8 +843,9 @@ public class ProtocolProcessor extends AbstractProcessor {
             }
             /* *********************** Root Part ************************ */
             if (!unRoot) {
+                // decode接口方法的返参也有可能是集合类型
                 if (isCollection && methodElement.getAnnotation(ByteBufDecode.class).parameters().length == 0) {
-                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.ArrayList\"}");
+                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
             }
             /* *********************** Common Part ************************ */
@@ -827,13 +858,17 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .parameters(byteBufConvertModelParameters)
                     .build();
             // 获取spelMapping注解的值作为decode_element_name
-            String originalDecodeElementName = isSpelObj ? classTypeElement.getAnnotation(SpelMapping.class).value() : element.getSimpleName().toString();
+            final String originalDecodeElementName = isSpelObj ? typeSymbol.getAnnotation(SpelMapping.class).value() : element.getSimpleName().toString();
+            /*
+             * Note:
+             * fix#issue3 这里不能放基本类型作为decode_type, 必须是包装类型
+             * 如果是基本类型就放包装类型, 由于集合类型考虑到泛型擦除, 不能使用typeSymbol, 只能用varSymbol
+             */
+            final TypeModel decodeTypeModel = new TypeModel(element.asType().getKind().isPrimitive() ? typeSymbol : element);
             final ProtocolDecode$1 protocolDecode$1 = ProtocolDecode$1.builder()
                     .method_head(MethodHeadModel.builder()
                             .modifier(MethodHeadModel.PRIVATE_FINAL)
-                            // fix#issue3 这里不能放基本类型作为返参, 必须是包装类型
-                            // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
-                            .return_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
+                            .return_type(decodeTypeModel)
                             .method_name(decodeMethodName)
                             .method_parameters(Arrays.asList(
                                     decodeByteBufParameter,
@@ -855,9 +890,7 @@ public class ProtocolProcessor extends AbstractProcessor {
                     // convertMethod 不为空的解析部分
                     .part1(ProtocolDecodePart$0.builder()
                             .convert_anon_model(convertAnonModel)
-                            // fix#issue3 这里不能放基本类型作为decode_type, 否则imports那边会出异常.
-                            // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
-                            .decode_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
+                            .decode_type(decodeTypeModel)
                             .channel_parameter(decodeChannelParameterName)
                             .decode_type_name(originalDecodeElementName)
                             .confused_buffer_name(obfuscateBufferName)
@@ -867,11 +900,9 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .channel_parameter(decodeChannelParameterName)
                     .standard_reader_index_parameter(DEFAULT_STANDARD_READER_INDEX)
                     // member mappings
-                    .member_mappings(new LinkedList<>())
+                    .member_mappings(Lists.newLinkedList())
                     .convert_model(convertAnonModel)
-                    // fix#issue3 这里不能放基本类型作为decode_type, 否则imports那边会出异常.
-                    // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
-                    .decode_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
+                    .decode_type(decodeTypeModel)
                     .decode_element_name(originalDecodeElementName)
                     // judgement
                     .is_not_primitive(isNotPrimitive)
@@ -884,19 +915,21 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .build();
             // spel元素或者集合元素内部元素遍历递归
             if (typeEnum == SPEL_OBJ) {
-                step_processInternalRecursive((TypeElement) typeUtils.asElement(element.asType()), protocolDecode$1);
+                protocolDecode$1.addAllInternalModelContext(step_processInternalRecursive(typeSymbol));
             }
             if (typeEnum == COLLECTION) {
                 // 获取集合元素的泛型元素
                 final Element genericElement = ElementUtils.getGenericElement(typeUtils, element);
-                final Symbol genericClassElement = (Symbol) typeUtils.asElement(genericElement.asType());
+                final Symbol genericClassElement = TypeUtils.getTypeSymbol(typeUtils, genericElement.asType());
                 // 生成泛型decode的混淆名
                 final String genericDecodeMethodName = generateObfuscatedName(genericElement.getSimpleName().toString());
                 // 把泛型注入到集合元素的memberMapping中
-                protocolDecode$1.addInternalModelContext(new InternalModelContext(
-                        new TypeModel(genericClassElement),
-                        genericElement.getSimpleName().toString(), genericDecodeMethodName
-                ));
+                protocolDecode$1.addInternalModelContext(InternalModelContext.builder()
+                        .member_name(ElementUtils.getSymbolTypeSimpleName(genericClassElement))
+                        .member_method_name(genericDecodeMethodName)
+                        .member_type(new TypeModel(genericClassElement))
+                        .build()
+                );
                 step_processInternalElements(genericClassElement, genericDecodeMethodName, false);
             }
             protocolImplModel.addDecodeElement(protocolDecode$1);

@@ -21,7 +21,7 @@ public class ProtocolEncodePart$0 extends JavaModelWritable {
 
     private ByteBufConvertAnonModel convert_anon_model;
     private TypeModel encode_type;
-    private String encode_type_name;
+    private String encode_element_name;
     private String channel_parameter;
     private String confused_buffer_name;
 

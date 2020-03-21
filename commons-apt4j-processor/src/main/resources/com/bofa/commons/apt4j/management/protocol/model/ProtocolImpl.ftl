@@ -18,7 +18,7 @@ ${javadoc()}
 <#if useComponent>@Component</#if>
 <@builder.build_type_head type_head>
     <#if useLogback>
-        <@logger.build_logger type_head.class_type.type_name/>
+        <@logger.build_logger type_head.impl_type.type_simple_name/>
     </#if>
     <#if useComponent>
         <#lt><#list autowires as autowire>

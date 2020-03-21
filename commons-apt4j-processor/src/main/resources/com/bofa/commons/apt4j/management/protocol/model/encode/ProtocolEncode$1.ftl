@@ -48,7 +48,7 @@
         <#if is_collection()>
             <#assign generic=member_mappings.get(0)/>
             <#assign generic_member_name = generic.member_name?uncap_first/>
-            for (final ${generic.member_type.type_name} ${generic_member_name} : ${encode_element_name}) {
+            for (final ${generic.member_type.type_simple_name} ${generic_member_name} : ${encode_element_name}) {
                 // 这里要更改基准writerIndex
                 final int ${confused_standard_writer_index_name} = ${current_buffer_name}.writerIndex();
                 ${generic.member_method_name}(${current_buffer_name}, ${generic_member_name}, ${channel_parameter}, ${confused_standard_writer_index_name});

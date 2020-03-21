@@ -23,9 +23,9 @@
     <#else>
         <#if is_not_primitive()>
             <#if is_spel_object()>
-                ${decode_type.type_name} ${decode_element_name} = new ${decode_type.type_name}();
+                ${decode_type.type_simple_name} ${decode_element_name} = new ${decode_type.type_simple_name}();
             <#elseif is_collection()>
-                ${decode_type.type_name} ${decode_element_name} = new ${convert_model.parameters[0]}();
+                ${decode_type.type_simple_name} ${decode_element_name} = new ${convert_model.parameters[0]}();
             </#if>
             _init("${decode_element_name}", ${decode_element_name}, ${current_buffer_name}, ${channel_parameter});
         </#if>
@@ -37,7 +37,7 @@
             </#if>
             <#if member_mappings??>
                 <#list member_mappings as sub>
-                    ${sub.member_type.type_name} ${sub.member_name} = ${sub.member_method_name}(${current_buffer_name}, ${channel_parameter}, ${current_standard_reader_index_parameter});
+                    ${sub.member_type.type_simple_name} ${sub.member_name} = ${sub.member_method_name}(${current_buffer_name}, ${channel_parameter}, ${current_standard_reader_index_parameter});
                     ${decode_element_name}.set${sub.member_name?cap_first}(${sub.member_name});
                 </#list>
             </#if>
@@ -47,7 +47,7 @@
             while (${confused_buffer_name}.isReadable()) {
                 // 这里要更改基准readerIndex
                 final int ${confused_standard_reader_index_name} = ${confused_buffer_name}.readerIndex();
-                ${generic.member_type.type_name} ${generic.member_name} = ${generic.member_method_name}(${confused_buffer_name}, ${channel_parameter}, ${confused_standard_reader_index_name});
+                ${generic.member_type.type_simple_name} ${generic.member_name} = ${generic.member_method_name}(${confused_buffer_name}, ${channel_parameter}, ${confused_standard_reader_index_name});
                 ${decode_element_name}.add(${generic.member_name});
             }
         </#if>

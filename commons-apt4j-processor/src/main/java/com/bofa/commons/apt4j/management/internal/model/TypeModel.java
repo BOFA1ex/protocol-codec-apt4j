@@ -5,8 +5,7 @@ import com.bofa.commons.apt4j.management.internal.utils.TypeUtils;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.util.Set;
 
@@ -18,15 +17,16 @@ import java.util.Set;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
+@Builder
 public class TypeModel extends JavaModelWritable {
 
-    private String type_name;
+    private String type_simple_name;
     private String type_qualifier_name;
 
     /** 只是为了测试 */
 //    @Deprecated
     public TypeModel(String typeSimpleName) {
-        this.type_name = typeSimpleName;
+        this.type_simple_name = typeSimpleName;
     }
 
     /** Exist Element */
@@ -39,8 +39,8 @@ public class TypeModel extends JavaModelWritable {
     }
 
     /* Virtual Type */
-    public TypeModel(String type_name, String type_qualifier_name) {
-        this.type_name = type_name;
+    public TypeModel(String type_simple_name, String type_qualifier_name) {
+        this.type_simple_name = type_simple_name;
         this.type_qualifier_name = type_qualifier_name;
     }
 

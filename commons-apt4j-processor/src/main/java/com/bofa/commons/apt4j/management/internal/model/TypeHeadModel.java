@@ -16,7 +16,7 @@ public class TypeHeadModel extends JavaModelWritable {
     public static final String DEFAULT_MODIFIER = "public final";
 
     private String modifier;
-    private TypeModel class_type;
+    private TypeModel impl_type;
     private TypeModel interface_type;
     private boolean needImplement;
     private TypeModel super_type;

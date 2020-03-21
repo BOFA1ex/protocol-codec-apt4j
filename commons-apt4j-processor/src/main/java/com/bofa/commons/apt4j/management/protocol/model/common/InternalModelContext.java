@@ -2,8 +2,7 @@ package com.bofa.commons.apt4j.management.protocol.model.common;
 
 import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Set;
 
@@ -13,6 +12,7 @@ import java.util.Set;
  */
 @Getter
 @Setter
+@Builder
 public class InternalModelContext extends JavaModelWritable {
 
     private TypeModel member_type;
