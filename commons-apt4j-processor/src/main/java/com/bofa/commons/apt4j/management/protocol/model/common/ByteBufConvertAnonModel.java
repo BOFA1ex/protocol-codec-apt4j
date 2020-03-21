@@ -1,6 +1,7 @@
 package com.bofa.commons.apt4j.management.protocol.model.common;
 
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
+import com.google.common.base.Strings;
 import lombok.*;
 
 import java.util.Set;
@@ -19,7 +20,8 @@ public class ByteBufConvertAnonModel extends JavaModelWritable {
     private String index;
     private String length;
     private String condition;
-    private String convert_method;
+    private String convert_method_qualifier;
+    private String convert_method_simple;
     private String[] parameters;
 
     public Set<String> getStatic_import_stats() {
@@ -27,6 +29,9 @@ public class ByteBufConvertAnonModel extends JavaModelWritable {
     }
 
     public Set<String> getImport_stats() {
+        if (!Strings.isNullOrEmpty(convert_method_qualifier)){
+            import_stats.add(convert_method_qualifier);
+        }
         return import_stats;
     }
 }

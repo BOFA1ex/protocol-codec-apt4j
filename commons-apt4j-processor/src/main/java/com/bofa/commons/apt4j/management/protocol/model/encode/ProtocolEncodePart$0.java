@@ -19,7 +19,7 @@ import java.util.Set;
 @Builder
 public class ProtocolEncodePart$0 extends JavaModelWritable {
 
-    private ByteBufConvertAnonModel convertAnonModel;
+    private ByteBufConvertAnonModel convert_anon_model;
     private TypeModel encode_type;
     private String encode_type_name;
     private String channel_parameter;
@@ -30,6 +30,7 @@ public class ProtocolEncodePart$0 extends JavaModelWritable {
     }
 
     public Set<String> getImport_stats() {
+        super.import_stats.addAll(convert_anon_model.getImport_stats());
         super.import_stats.addAll(
                 Sets.newHashSet(
                         "com.bofa.resolve.util.ChannelSpelContextUtils",

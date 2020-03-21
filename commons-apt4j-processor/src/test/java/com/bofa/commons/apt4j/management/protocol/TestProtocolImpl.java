@@ -38,23 +38,23 @@ public class TestProtocolImpl {
 
     @Test
     public void testProtocolImpl() {
-        ProtocolImpl _impl = new ProtocolImpl(
-                "com.bofa.protocol.flv",
-                TypeHeadModel.builder()
+        ProtocolImpl _impl = ProtocolImpl.builder()
+                .package_name("com.bofa.protocol.flv")
+                .type_head(TypeHeadModel.builder()
                         .modifier(TypeHeadModel.DEFAULT_MODIFIER)
                         .class_type(new TypeModel("FlvParserImpl"))
                         .interface_type(new TypeModel("FlvParser"))
                         .needImplement(true)
-                        .build(),
-                _buildProtocolDecodeEntrance(),
-                Collections.singletonList(_buildProtocolDecodeRootObject()),
-                _buildProtocolEncodeEntrance(),
-                Collections.singletonList(_buildProtocolEncodeRootObject()),
-                Arrays.asList(
+                        .build())
+                .decode_root_element(_buildProtocolDecodeEntrance())
+                .decode_elements( Collections.singletonList(_buildProtocolDecodeRootObject()))
+                .encode_root_element(_buildProtocolEncodeEntrance())
+                .encode_elements( Collections.singletonList(_buildProtocolEncodeRootObject()))
+                .common_methods( Arrays.asList(
                         _buildInitChannelSpelContextMethod(),
                         _buildInitMarkAndReadSliceMethod()
-                )
-        );
+                ))
+                .build();
         generator.generateModel(_impl);
     }
 
@@ -70,7 +70,7 @@ public class TestProtocolImpl {
                 .is_override(true)
                 .build();
         final InitValidation initValidation = InitValidation.builder()
-                .validate_name("CheckSumValidateMethod")
+                .validate_qualifier_name("CheckSumValidateMethod")
                 .validate_index("0")
                 .validate_length("9")
                 .mapper_index("9")
@@ -108,7 +108,7 @@ public class TestProtocolImpl {
                 .is_override(true)
                 .build();
         final InitValidation initValidation = InitValidation.builder()
-                .validate_name("CheckSumValidateMethod")
+                .validate_qualifier_name("CheckSumValidateMethod")
                 .validate_index("0")
                 .validate_length("9")
                 .mapper_index("9")
@@ -127,9 +127,14 @@ public class TestProtocolImpl {
                 .decode_method_name("_decodeFlvFile")
                 .buffer_parameter("buffer")
                 .channel_parameter("channel")
-                .resolve_exception_name("FlvDecodeResolveExceptionMethod")
+                .init_resolve_exception(InitResolveException.builder()
+                        .channel_parameter("channel")
+                        .decode_element_name("flvFile")
+                        .decode_type(new TypeModel("FlvFile"))
+                        .resolve_exception_simple_name("FlvDecodeResolveExceptionMethod")
+                        .build())
                 .build();
-        protocolDecode.setValidate_condition(initValidation);
+        protocolDecode.setInit_validation(initValidation);
         return protocolDecode;
     }
 
@@ -164,7 +169,7 @@ public class TestProtocolImpl {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolDecodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .decode_type(new TypeModel("FlvFile"))
                         .channel_parameter("channel")
                         .decode_type_name("flvFile")
@@ -228,7 +233,7 @@ public class TestProtocolImpl {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .channel_parameter("channel")
                         .encode_type_name("flvFile")
                         .build())
@@ -282,7 +287,7 @@ public class TestProtocolImpl {
 
     static InitMarkAndReadSliceMethod _buildInitMarkAndReadSliceMethod() {
         return InitMarkAndReadSliceMethod.builder()
-                .log_message(InitMarkAndReadSliceMethod.DEFAULT_LOG_MESSAGE)
+                .log_message(InitMarkAndReadSliceMethod.SYSTEM_LOG_MESSAGE)
                 .method_head(MethodHeadModel.builder()
                         .modifier(MethodHeadModel.PRIVATE_FINAL)
                         .return_type(new TypeModel("ByteBuf"))

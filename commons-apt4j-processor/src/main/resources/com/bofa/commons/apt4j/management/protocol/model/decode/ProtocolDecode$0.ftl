@@ -8,9 +8,9 @@
 <#import "../../../internal/lib/ModelBuilder.ftl" as builder/>
 <#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.decode.ProtocolDecode$0" -->
 <@builder.build_method_head method_head>
-    <#if validate_condition??>
+    <#if getInit_validation??>
         // 校验缓冲区报文
-        <@includeModel object=validate_condition/>
+        <@includeModel object=init_validation/>
     </#if>
     // 基准readerIndex standard_reader_index
     final int standard_reader_index = ${buffer_parameter}.readerIndex();
@@ -18,7 +18,7 @@
     try {
         ${decode_element_name} = ${decode_method_name}(${buffer_parameter}, ${channel_parameter}, standard_reader_index);
     } catch(Exception e) {
-        ${decode_element_name} = (${decode_type.type_name})${resolve_exception_name}.INSTANCE.resolveException(${decode_type.type_name}.class, e, ${channel_parameter});
+        <@includeModel object=init_resolve_exception/>
     }
     return ${decode_element_name};
 </@builder.build_method_head>

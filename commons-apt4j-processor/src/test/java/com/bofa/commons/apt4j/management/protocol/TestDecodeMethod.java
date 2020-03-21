@@ -22,7 +22,6 @@ public class TestDecodeMethod {
     public void testDecodeInternalCollectionElement() {
         final ByteBufConvertAnonModel convertAnonModel = ByteBufConvertAnonModel.builder()
                 .index("9").length("#flvFile_buffer.readableBytes()").condition("true")
-                .convert_method(null)
                 .parameters(new String[]{"java.util.ArrayList"})
                 .build();
         final ProtocolDecode$1 _decode = ProtocolDecode$1.builder()
@@ -57,7 +56,7 @@ public class TestDecodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolDecodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .decode_type(new TypeModel("List<FlvTag>"))
                         .channel_parameter("channel")
                         .decode_type_name("flvTags")
@@ -93,7 +92,7 @@ public class TestDecodeMethod {
                 .is_override(true)
                 .build();
         final InitValidation initValidation = InitValidation.builder()
-                .validate_name("CheckSumValidateMethod")
+                .validate_qualifier_name("CheckSumValidateMethod")
                 .validate_index("0")
                 .validate_length("9")
                 .mapper_index("9")
@@ -107,13 +106,18 @@ public class TestDecodeMethod {
                 .build();
         ProtocolDecode$0 protocolDecode = ProtocolDecode$0.builder()
                 .method_head(methodHead)
-                .validate_condition(initValidation)
+                .init_validation(initValidation)
                 .decode_type(new TypeModel("FlvFile"))
                 .decode_element_name("flvFile")
                 .decode_method_name("_decodeFlvFile")
                 .buffer_parameter("buffer")
                 .channel_parameter("channel")
-                .resolve_exception_name("FlvDecodeResolveExceptionMethod")
+                .init_resolve_exception(InitResolveException.builder()
+                        .channel_parameter("channel")
+                        .decode_element_name("flvFile")
+                        .decode_type(new TypeModel("FlvFile"))
+                        .resolve_exception_qualifier_name("FlvDecodeResolveExceptionMethod")
+                        .build())
                 .build();
         generator.generateModel(protocolDecode);
     }
@@ -151,7 +155,7 @@ public class TestDecodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolDecodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .decode_type(new TypeModel("FlvFile"))
                         .channel_parameter("channel")
                         .decode_type_name("flvFile")
@@ -190,7 +194,7 @@ public class TestDecodeMethod {
                 .index("0")
                 .length("3")
                 .condition("true")
-                .convert_method("AsciiConvertMethod")
+                .convert_method_simple("AsciiConvertMethod")
                 .build();
         final ProtocolDecode$1 _decode = ProtocolDecode$1.builder()
                 .method_head(MethodHeadModel.builder()
@@ -221,7 +225,7 @@ public class TestDecodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolDecodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .decode_type(new TypeModel("String"))
                         .channel_parameter("channel")
                         .decode_type_name("signature")
@@ -250,7 +254,6 @@ public class TestDecodeMethod {
                 .index("15")
                 .length("#flvTag.dataLength")
                 .condition("#flvTag.tagType == 8")
-                .convert_method(null)
                 .build();
         final ProtocolDecode$1 _decode = ProtocolDecode$1.builder()
                 .method_head(MethodHeadModel.builder()
@@ -281,7 +284,7 @@ public class TestDecodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolDecodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .decode_type(new TypeModel("FlvAudioTagBody"))
                         .channel_parameter("channel")
                         .decode_type_name("flvAudioTagBody")

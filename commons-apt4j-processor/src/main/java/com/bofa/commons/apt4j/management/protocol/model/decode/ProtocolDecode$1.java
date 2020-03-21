@@ -58,6 +58,7 @@ public class ProtocolDecode$1 extends JavaModelWritable {
         super.import_stats.addAll(part0.getImport_stats());
         super.import_stats.addAll(part1.getImport_stats());
         super.import_stats.addAll(decode_type.getImport_stats());
+        super.import_stats.addAll(convert_model.getImport_stats());
         return import_stats;
     }
 }

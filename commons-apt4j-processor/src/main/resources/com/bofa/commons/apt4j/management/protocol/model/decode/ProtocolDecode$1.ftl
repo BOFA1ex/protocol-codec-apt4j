@@ -17,7 +17,7 @@
         final ByteBuf ${confused_buffer_name} = markAndReadSlice(${buffer_parameter}, index, length);
         <#assign current_buffer_name=confused_buffer_name/>
     </#if>
-    <#if convert_model.convert_method??>
+    <#if convert_model.convert_method_qualifier??>
     <#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.decode.ProtocolDecodePart$0" -->
         <@includeModel object=part1/>
     <#else>

@@ -63,7 +63,7 @@ public class TestCommonMethod {
                         ))
                         .is_override(false)
                         .build())
-                .log_message(InitMarkAndReadSliceMethod.DEFAULT_LOG_MESSAGE)
+                .log_message(InitMarkAndReadSliceMethod.SYSTEM_LOG_MESSAGE)
                 .buffer_parameter("buffer")
                 .reader_index_parameter("index")
                 .length_parameter("length")
@@ -75,7 +75,7 @@ public class TestCommonMethod {
     public void testInitValidation() {
         FreeMarkerModelGenerator generator = new FreeMarkerModelGenerator();
         final InitValidation initValidation = InitValidation.builder()
-                .validate_name("TestValidation")
+                .validate_qualifier_name("TestValidation")
                 .validate_index("0")
                 .validate_length("-1")
                 .mapper_index("8")

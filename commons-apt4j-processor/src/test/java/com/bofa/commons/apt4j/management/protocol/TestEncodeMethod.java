@@ -29,7 +29,7 @@ public class TestEncodeMethod {
                 .is_override(true)
                 .build();
         final InitValidation initValidation = InitValidation.builder()
-                .validate_name("CheckSumValidateMethod")
+                .validate_qualifier_name("CheckSumValidateMethod")
                 .validate_index("0")
                 .validate_length("9")
                 .mapper_index("9")
@@ -90,7 +90,7 @@ public class TestEncodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .channel_parameter("channel")
                         .encode_type(new TypeModel("FlvFile"))
                         .encode_type_name("flvFile")
@@ -129,7 +129,7 @@ public class TestEncodeMethod {
                 .index("0")
                 .length("3")
                 .condition("true")
-                .convert_method("AsciiConvertMethod")
+                .convert_method_simple("AsciiConvertMethod")
                 .build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
                 .method_head(MethodHeadModel.builder()
@@ -160,7 +160,7 @@ public class TestEncodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .encode_type(new TypeModel("String"))
                         .encode_type_name("signature")
                         .channel_parameter("channel")
@@ -187,7 +187,6 @@ public class TestEncodeMethod {
     public void testEncodeInternalCollectionElement(){
         final ByteBufConvertAnonModel convertAnonModel = ByteBufConvertAnonModel.builder()
                 .index("9").length("#flvFile_buffer.readableBytes()").condition("true")
-                .convert_method(null)
                 .parameters(new String[]{"java.util.ArrayList"})
                 .build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
@@ -222,7 +221,7 @@ public class TestEncodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .encode_type(new TypeModel("List<FlvTag>"))
                         .encode_type_name("flvTags")
                         .channel_parameter("channel")
@@ -251,7 +250,6 @@ public class TestEncodeMethod {
                 .index("15")
                 .length("#flvTag.dataLength")
                 .condition("#flvTag.tagType == 8")
-                .convert_method(null)
                 .build();
         final ProtocolEncode$1 _encode = ProtocolEncode$1.builder()
                 .method_head(MethodHeadModel.builder()
@@ -286,7 +284,7 @@ public class TestEncodeMethod {
                         .build())
                 // convertMethod 不为空的解析部分
                 .part1(ProtocolEncodePart$0.builder()
-                        .convertAnonModel(convertAnonModel)
+                        .convert_anon_model(convertAnonModel)
                         .encode_type(new TypeModel("FlvAudioTagBody"))
                         .encode_type_name("flvAudioTagBody")
                         .channel_parameter("channel")

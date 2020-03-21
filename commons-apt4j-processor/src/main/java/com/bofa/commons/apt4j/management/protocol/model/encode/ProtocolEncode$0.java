@@ -32,13 +32,17 @@ public class ProtocolEncode$0 extends JavaModelWritable {
     private InitBuffer init_buffer;
     private InitValidation validate_condition;
 
+    public void setValidate_condition(InitValidation validate_condition) {
+        this.validate_condition = validate_condition;
+        super.import_stats.addAll(validate_condition.getImport_stats());
+    }
+
     public Set<String> getStatic_import_stats() {
         return null;
     }
 
     public Set<String> getImport_stats() {
         import_stats.addAll(method_head.getImport_stats());
-        import_stats.addAll(validate_condition.getImport_stats());
         import_stats.addAll(encode_type.getImport_stats());
         return import_stats;
     }

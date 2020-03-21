@@ -56,6 +56,7 @@ public class ProtocolEncode$1 extends JavaModelWritable {
         super.import_stats.addAll(part0.getImport_stats());
         super.import_stats.addAll(part1.getImport_stats());
         super.import_stats.addAll(encode_type.getImport_stats());
+        super.import_stats.addAll(convert_model.getImport_stats());
         return import_stats;
     }
 }

@@ -18,7 +18,7 @@
     <#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.common.ProtocolSpelProcessExpr" -->
         <@includeModel object=part0/>
     </#if>
-    <#if convert_model.convert_method??>
+    <#if convert_model.convert_method_qualifier??>
     <#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.encode.ProtocolEncodePart$0" -->
         <@includeModel object=part1/>
     <#else>

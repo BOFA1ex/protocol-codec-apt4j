@@ -12,6 +12,7 @@ import com.bofa.commons.apt4j.management.protocol.model.common.*;
 import com.bofa.commons.apt4j.management.protocol.model.decode.*;
 import com.bofa.commons.apt4j.management.protocol.model.encode.*;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.processing.JavacProcessingEnvironment;
 import com.sun.tools.javac.util.Context;
@@ -123,6 +124,10 @@ public class ProtocolProcessor extends AbstractProcessor {
                         .needExtends(needExtends)
                         .needImplement(needImplement)
                         .build())
+                .decode_elements(new ArrayList<>())
+                .encode_elements(new ArrayList<>())
+                .common_methods(new ArrayList<>())
+                .autowires(new HashSet<>())
                 .build();
         // process logback&component options
         final boolean useLogback = processLogbackOption(protocolImplModel);
@@ -378,6 +383,14 @@ public class ProtocolProcessor extends AbstractProcessor {
             CompletableFuture.allOf(totalTasks).join();
         }
 
+        protected String qualifierName2SimpleName(String qualifierName){
+            if (Strings.isNullOrEmpty(qualifierName)) {
+                return null;
+            }
+            String[] temp = qualifierName.split("\\.");
+            return temp[temp.length -1];
+        }
+
         protected abstract void step_processInternalElements(Symbol typeElement, String memberMethodName, boolean unRoot);
     }
 
@@ -495,7 +508,8 @@ public class ProtocolProcessor extends AbstractProcessor {
             boolean isSpelObj = (typeEnum == SPEL_OBJ);
             boolean isCollection = (typeEnum == COLLECTION);
             boolean isNotPrimitive = typeEnum != PRIMITIVE;
-            String byteBufConvertModelConvertMethod = null;
+            String byteBufConvertModelConvertMethodQualifierName = null;
+            String byteBufConvertModelConvertMethodSimpleName = null;
             String byteBufConvertModelIndex = null;
             String byteBufConvertModelLength = null;
             String byteBufConvertModelCondition = null;
@@ -514,7 +528,11 @@ public class ProtocolProcessor extends AbstractProcessor {
                 byteBufConvertModelLength = resolveEncodeByteBufConvertAnonLength(byteBufConvertAnon.length());
                 byteBufConvertModelCondition = byteBufConvertAnon.condition();
                 byteBufConvertModelParameters = byteBufConvertAnon.parameters();
-                byteBufConvertModelConvertMethod = TypeUtils.resolveClassTypeMirrorException(byteBufConvertAnon::convertMethod);
+                // convertMethod resolve qualifier/simple
+                byteBufConvertModelConvertMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufConvertAnon::convertMethod);
+                byteBufConvertModelConvertMethodSimpleName = qualifierName2SimpleName(byteBufConvertModelConvertMethodQualifierName);
+                // 注入byteBufConvertModelConvertMethod到装配依赖项里
+                protocolImplModel.addAutoWire(byteBufConvertModelConvertMethodSimpleName);
                 obfuscateBufferName = generateObfuscatedName(DEFAULT_BUFFER_PARAMETER_NAME);
                 originalStandardWriterIndex = isNotPrimitive ? generateObfuscatedName(DEFAULT_STANDARD_WRITER_INDEX) : DEFAULT_STANDARD_WRITER_INDEX;
             }
@@ -523,7 +541,8 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .index(byteBufConvertModelIndex)
                     .length(byteBufConvertModelLength)
                     .condition(byteBufConvertModelCondition)
-                    .convert_method(byteBufConvertModelConvertMethod)
+                    .convert_method_qualifier(byteBufConvertModelConvertMethodQualifierName)
+                    .convert_method_simple(byteBufConvertModelConvertMethodSimpleName)
                     .parameters(byteBufConvertModelParameters)
                     .build();
             // 获取spelMapping注解的值作为encode_element_name
@@ -561,7 +580,7 @@ public class ProtocolProcessor extends AbstractProcessor {
                             .build())
                     // convertMethod 不为空的解析部分
                     .part1(ProtocolEncodePart$0.builder()
-                            .convertAnonModel(convertAnonModel)
+                            .convert_anon_model(convertAnonModel)
                             // fix#issue3 这里不能放基本类型作为encode_type, 必须是包装类型
                             // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
                             .encode_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
@@ -624,9 +643,14 @@ public class ProtocolProcessor extends AbstractProcessor {
             final String mapperIndex = mapper.index();
             final String mapperLength = mapper.length();
             final String[] parameters = byteBufValidationAnon.parameters();
-            final String validateMethodSimpleName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
+            // validate resolve qualifier/simple
+            final String validateMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
+            final String validateMethodSimpleName = qualifierName2SimpleName(validateMethodQualifierName);
+            // 注入validateMethod到装配依赖项里
+            protocolImplModel.addAutoWire(validateMethodSimpleName);
             final InitValidation initValidation = InitValidation.builder()
-                    .validate_name(validateMethodSimpleName)
+                    .validate_qualifier_name(validateMethodQualifierName)
+                    .validate_simple_name(validateMethodSimpleName)
                     .validate_index(validateIndex)
                     .validate_length(validateLength)
                     .mapper_index(mapperIndex)
@@ -640,8 +664,6 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .build();
             this.overrideEncode.setValidate_condition(initValidation);
         }
-
-
     }
 
     @Setter
@@ -671,10 +693,13 @@ public class ProtocolProcessor extends AbstractProcessor {
             this.setProtocolImplModel(protocolImplModel);
             this.setMethodReturnTypeElement((TypeElement) typeUtils.asElement(element.getReturnType()));
             this.setDecodeChannelParameter(element.getParameters().stream()
-                    .filter(variableEle -> ElementUtils.getSymbolTypeSimpleName((Symbol) variableEle).equals(ProtocolGenerateConstant.CHANNEL_TYPE_NAME))
+                    // VariableElement 强转 Symbol
                     .map(variableEle -> (Symbol) variableEle)
+                    // variable元素是否为channel类型
+                    .filter(variableEle -> ElementUtils.getSymbolTypeSimpleName(variableEle).equals(ProtocolGenerateConstant.CHANNEL_TYPE_NAME))
                     // inject decodeChannelParameterName
                     .peek(variableEle -> this.setDecodeChannelParameterName(variableEle.getSimpleName().toString()))
+                    // generate MethodParameterModel
                     .map(variableEle -> new MethodParameterModel(new TypeModel(variableEle), variableEle.getSimpleName().toString()))
                     .findFirst()
                     .orElseThrow(() -> new IllegalArgumentException("接口方法定义找不到Channel参数)")));
@@ -694,8 +719,10 @@ public class ProtocolProcessor extends AbstractProcessor {
             // 校验returnType必须由spelMapping修饰, 或者其泛型类型由spelMapping修饰
             requireElementModifiedBySpelMapping(methodReturnTypeElement);
             // ByteBufDecode Anon properties
-            // resolve exception class name
-            final String resolveExceptionTypeSimpleName = TypeUtils.resolveClassTypeMirrorException(() -> methodElement.getAnnotation(ByteBufDecode.class).resolveException());
+            // resolve exception qualifer/simple
+            final String resolveExceptionTypeQualifierName = TypeUtils.resolveClassTypeMirrorException(() -> methodElement.getAnnotation(ByteBufDecode.class).resolveException());
+            final String resolveExceptionTypeSimpleName = qualifierName2SimpleName(resolveExceptionTypeQualifierName);
+            protocolImplModel.addAutoWire(resolveExceptionTypeSimpleName);
             final String modifier = methodElement.getModifiers().stream()
                     // 接口定义的方法 modifier默认是public abstract, 需要手动过滤abstract修饰符
                     .filter(mod -> mod != Modifier.ABSTRACT)
@@ -720,15 +747,24 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .decode_method_name(decodeMethodName)
                     .buffer_parameter(decodeByteBufParameterName)
                     .channel_parameter(decodeChannelParameterName)
-                    .resolve_exception_name(resolveExceptionTypeSimpleName)
                     .build()
             );
             // inject validation condition in ProtocolDecode$0
             injectValidateInOverrideDecodeMethod();
+            // inject resolve exception in ProtocolDecode$0
+            InitResolveException initResolveException = InitResolveException.builder()
+                    .decode_type(returnType)
+                    .decode_element_name(returnTypeElementSimpleName)
+                    .channel_parameter(decodeChannelParameterName)
+                    .resolve_exception_qualifier_name(resolveExceptionTypeQualifierName)
+                    .resolve_exception_simple_name(resolveExceptionTypeSimpleName)
+                    .build();
+            this.overrideDecode.setInit_resolve_exception(initResolveException);
             // inject ProtocolDecode$0 in protocolImplModel
             this.protocolImplModel.setDecode_root_element(overrideDecode);
             return this;
         }
+
 
         /** finally stage */
         public void step__over() {
@@ -748,7 +784,8 @@ public class ProtocolProcessor extends AbstractProcessor {
             boolean isSpelObj = (typeEnum == SPEL_OBJ);
             boolean isCollection = (typeEnum == COLLECTION);
             boolean isNotPrimitive = typeEnum != PRIMITIVE;
-            String byteBufConvertModelConvertMethod = null;
+            String byteBufConvertModelConvertMethodQualifierName = null;
+            String byteBufConvertModelConvertMethodSimpleName = null;
             String byteBufConvertModelIndex = null;
             String byteBufConvertModelLength = null;
             String byteBufConvertModelCondition = null;
@@ -766,7 +803,11 @@ public class ProtocolProcessor extends AbstractProcessor {
                 byteBufConvertModelLength = byteBufConvertAnon.length();
                 byteBufConvertModelCondition = byteBufConvertAnon.condition();
                 byteBufConvertModelParameters = byteBufConvertAnon.parameters();
-                byteBufConvertModelConvertMethod = TypeUtils.resolveClassTypeMirrorException(byteBufConvertAnon::convertMethod);
+                // convertMethod resolve qualifier/simple
+                byteBufConvertModelConvertMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufConvertAnon::convertMethod);
+                byteBufConvertModelConvertMethodSimpleName = qualifierName2SimpleName(byteBufConvertModelConvertMethodQualifierName);
+                // 注入byteBufConvertModelConvertMethod到装配依赖项里
+                protocolImplModel.addAutoWire(byteBufConvertModelConvertMethodSimpleName);
                 obfuscateBufferName = generateObfuscatedName(decodeByteBufParameterName);
                 originalStandardReaderIndex = isNotPrimitive ? generateObfuscatedName(DEFAULT_STANDARD_READER_INDEX) : DEFAULT_STANDARD_READER_INDEX;
             }
@@ -781,7 +822,8 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .index(byteBufConvertModelIndex)
                     .length(byteBufConvertModelLength)
                     .condition(byteBufConvertModelCondition)
-                    .convert_method(byteBufConvertModelConvertMethod)
+                    .convert_method_qualifier(byteBufConvertModelConvertMethodQualifierName)
+                    .convert_method_simple(byteBufConvertModelConvertMethodSimpleName)
                     .parameters(byteBufConvertModelParameters)
                     .build();
             // 获取spelMapping注解的值作为decode_element_name
@@ -812,7 +854,7 @@ public class ProtocolProcessor extends AbstractProcessor {
                             .build())
                     // convertMethod 不为空的解析部分
                     .part1(ProtocolDecodePart$0.builder()
-                            .convertAnonModel(convertAnonModel)
+                            .convert_anon_model(convertAnonModel)
                             // fix#issue3 这里不能放基本类型作为decode_type, 否则imports那边会出异常.
                             // 这里权衡下, 如果是基本类型就放包装类型, 如果是集合类型, 如果放classType, 泛型类型就被擦除了.
                             .decode_type(new TypeModel(element.asType().getKind().isPrimitive() ? classTypeElement : element))
@@ -874,9 +916,13 @@ public class ProtocolProcessor extends AbstractProcessor {
             final String mapperIndex = mapper.index();
             final String mapperLength = mapper.length();
             final String[] parameters = byteBufValidationAnon.parameters();
-            final String validateMethodSimpleName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
+            final String validateMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
+            final String validateMethodSimpleName = qualifierName2SimpleName(validateMethodQualifierName);
+            // 注入validateMethod到装配依赖项里
+            protocolImplModel.addAutoWire(validateMethodSimpleName);
             final InitValidation initValidation = InitValidation.builder()
-                    .validate_name(validateMethodSimpleName)
+                    .validate_qualifier_name(validateMethodQualifierName)
+                    .validate_simple_name(validateMethodSimpleName)
                     .validate_index(validateIndex)
                     .validate_length(validateLength)
                     .mapper_index(mapperIndex)
@@ -888,7 +934,7 @@ public class ProtocolProcessor extends AbstractProcessor {
                     // validate/mapper flag
                     .is_validate(isValidate)
                     .build();
-            this.overrideDecode.setValidate_condition(initValidation);
+            this.overrideDecode.setInit_validation(initValidation);
         }
     }
 }

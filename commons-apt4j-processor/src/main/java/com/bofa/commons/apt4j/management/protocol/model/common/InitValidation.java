@@ -19,7 +19,8 @@ public class InitValidation extends JavaModelWritable {
 
     private boolean is_validate;
 
-    private String validate_name;
+    private String validate_qualifier_name;
+    private String validate_simple_name;
     private String validate_index;
     private String validate_length;
     private String mapper_index;
@@ -34,7 +35,7 @@ public class InitValidation extends JavaModelWritable {
     }
 
     public Set<String> getImport_stats() {
-        import_stats.add(validate_name);
+        import_stats.add(validate_qualifier_name);
         return import_stats;
     }
 }

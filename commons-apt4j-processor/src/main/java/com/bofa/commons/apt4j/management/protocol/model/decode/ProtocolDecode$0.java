@@ -3,6 +3,7 @@ package com.bofa.commons.apt4j.management.protocol.model.decode;
 import com.bofa.commons.apt4j.management.internal.model.MethodHeadModel;
 import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
+import com.bofa.commons.apt4j.management.protocol.model.common.InitResolveException;
 import com.bofa.commons.apt4j.management.protocol.model.common.InitValidation;
 import lombok.*;
 
@@ -28,13 +29,17 @@ public class ProtocolDecode$0 extends JavaModelWritable {
     private String buffer_parameter;
     private String channel_parameter;
 
-    private String resolve_exception_name;
-    private InitValidation validate_condition;
+    private InitValidation init_validation;
+    private InitResolveException init_resolve_exception;
 
-    public void setValidate_condition(InitValidation validate_condition) {
-        this.validate_condition = validate_condition;
-        // Nullable?lazy-load
-        super.import_stats.addAll(validate_condition.getImport_stats());
+    public void setInit_validation(InitValidation init_validation) {
+        this.init_validation = init_validation;
+        super.import_stats.addAll(init_validation.getImport_stats());
+    }
+
+    public void setInit_resolve_exception(InitResolveException init_resolve_exception) {
+        this.init_resolve_exception = init_resolve_exception;
+        super.import_stats.addAll(init_resolve_exception.getImport_stats());
     }
 
     public Set<String> getStatic_import_stats() {
@@ -44,7 +49,6 @@ public class ProtocolDecode$0 extends JavaModelWritable {
     public Set<String> getImport_stats() {
         super.import_stats.addAll(method_head.getImport_stats());
         super.import_stats.addAll(decode_type.getImport_stats());
-        super.import_stats.add(resolve_exception_name);
         return import_stats;
     }
 }
