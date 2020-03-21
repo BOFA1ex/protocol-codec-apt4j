@@ -5,8 +5,7 @@ import java.lang.annotation.*;
 /**
  * @author bofa1ex
  * @version 1.0
- * @package com.bofa.commons.apt4j.annotate.apt.annotate
- * @date 2019/12/31
+ * @since  2019/12/31
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
