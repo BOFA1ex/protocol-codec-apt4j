@@ -21,21 +21,11 @@ public class ProtocolSpelProcessExpr extends JavaModelWritable {
     private String channel_parameter;
     private String standard_index_parameter;
 
-    public ProtocolSpelProcessExpr(ByteBufConvertAnonModel convert_anon_model, String buffer_parameter, String channel_parameter, String standard_index_parameter) {
-        this.convert_anon_model = convert_anon_model;
-        this.buffer_parameter = buffer_parameter;
-        this.channel_parameter = channel_parameter;
-        this.standard_index_parameter = standard_index_parameter;
-    }
-
     public Set<String> getStatic_import_stats() {
         return null;
     }
 
     public Set<String> getImport_stats() {
-        import_stats.add("com.bofa.resolve.util.ChannelSpelContextUtils");
-        import_stats.add( "io.netty.channel.Channel");
-        import_stats.add("io.netty.buffer.*");
         return import_stats;
     }
 }

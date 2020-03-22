@@ -22,6 +22,7 @@ public class InitBuffer extends JavaModelWritable {
     }
 
     public Set<String> getImport_stats() {
-        return null;
+        super.import_stats.add("io.netty.buffer.PooledByteBufAllocator");
+        return import_stats;
     }
 }

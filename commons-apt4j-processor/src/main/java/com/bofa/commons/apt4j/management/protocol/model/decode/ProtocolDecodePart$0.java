@@ -32,11 +32,6 @@ public class ProtocolDecodePart$0 extends JavaModelWritable {
     public Set<String> getImport_stats() {
         super.import_stats.addAll(decode_type.getImport_stats());
         super.import_stats.addAll(convert_anon_model.getImport_stats());
-        super.import_stats.addAll(
-                Sets.newHashSet("com.bofa.codec.util.ChannelSpelContextUtils",
-                        "io.netty.channel.Channel",
-                        "io.netty.buffer.*")
-        );
         return import_stats;
     }
 }

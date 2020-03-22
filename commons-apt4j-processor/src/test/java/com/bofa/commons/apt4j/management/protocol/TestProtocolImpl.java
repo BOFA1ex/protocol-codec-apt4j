@@ -192,14 +192,46 @@ public class TestProtocolImpl {
                 .confused_standard_reader_index_name(null)
                 .build();
         Arrays.asList(
-                new InternalModelContext(new TypeModel("String"), "signature", "_6c186Signature"),
-                new InternalModelContext(new TypeModel("Integer"), "version", "_0d93aVersion"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved", "_6a8c5TypeFlagsReserved"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
-                new InternalModelContext(new TypeModel("Integer"), "dataOffset", "_819a1DataOffset"),
-                new InternalModelContext(new TypeModel("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
+                InternalModelContext.builder()
+                        .member_name("signature")
+                        .member_method_name("_6c186Signature")
+                        .member_type(new TypeModel("String"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("version")
+                        .member_method_name("_0d93aVersion")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsReserved")
+                        .member_method_name("_6a8c5TypeFlagsReserved")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsAudio")
+                        .member_method_name("_61bddTypeFlagsAudio")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsReserved2")
+                        .member_method_name("_007deTypeFlagsReserved2")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsVideo")
+                        .member_method_name("_57269TypeFlagsVideo")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("dataOffset")
+                        .member_method_name("_819a1DataOffset")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("flvTags")
+                        .member_method_name("_1cd12FlvTags")
+                        .member_type(new TypeModel("List<FlvTag>"))
+                        .build()
         ).forEach(_decode::addInternalModelContext);
         return _decode;
     }
@@ -254,14 +286,46 @@ public class TestProtocolImpl {
                 .confused_standard_writer_index_name(null)
                 .build();
         Arrays.asList(
-                new InternalModelContext(new TypeModel("String"), "signature", "_6d186Signature"),
-                new InternalModelContext(new TypeModel("Integer"), "version", "_0d94aVersion"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved", "_6a8c6TypeFlagsReserved"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsAudio", "_61bddTypeFlagsAudio"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsReserved2", "_007deTypeFlagsReserved2"),
-                new InternalModelContext(new TypeModel("Integer"), "typeFlagsVideo", "_57269TypeFlagsVideo"),
-                new InternalModelContext(new TypeModel("Integer"), "dataOffset", "_819a1DataOffset"),
-                new InternalModelContext(new TypeModel("List<FlvTag>"), "flvTags", "_1cd12FlvTags")
+                InternalModelContext.builder()
+                        .member_name("signature")
+                        .member_method_name("_6c186Signature")
+                        .member_type(new TypeModel("String"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("version")
+                        .member_method_name("_0d93aVersion")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsReserved")
+                        .member_method_name("_6a8c5TypeFlagsReserved")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsAudio")
+                        .member_method_name("_61bddTypeFlagsAudio")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsReserved2")
+                        .member_method_name("_007deTypeFlagsReserved2")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("typeFlagsVideo")
+                        .member_method_name("_57269TypeFlagsVideo")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("dataOffset")
+                        .member_method_name("_819a1DataOffset")
+                        .member_type(new TypeModel("Integer"))
+                        .build(),
+                InternalModelContext.builder()
+                        .member_name("flvTags")
+                        .member_method_name("_1cd12FlvTags")
+                        .member_type(new TypeModel("List<FlvTag>"))
+                        .build()
         ).forEach(_encode::addInternalModelContext);
         return _encode;
     }
