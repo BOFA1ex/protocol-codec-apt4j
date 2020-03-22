@@ -299,10 +299,29 @@ public class ProtocolProcessor extends AbstractProcessor {
          * 处理ByteBufConvert注解中的length字段, 如果该字段的expr是对xx_buffer.readableBytes()
          * 在encode阶段, readableBytes为writerIndex, 明显不符合要求, 缓冲区内部是可以弹性扩容的, 这里直接给定writableBytes即可
          */
+        protected static String resolveEncodeByteBufConvertAnonIndex(String byteBufConvertIndex) {
+            final String bfindStr = "readableBytes";
+            final String ifindStr = "readerIndex";
+            final String replaceStr = "writerIndex";
+            if (byteBufConvertIndex.matches(".*readableBytes.*")){
+                return byteBufConvertIndex.replace(bfindStr, replaceStr);
+            }
+            if (byteBufConvertIndex.matches(".*readerIndex.*")){
+                return byteBufConvertIndex.replace(ifindStr, replaceStr);
+            }
+            return byteBufConvertIndex;
+        }
+
+        /**
+         * 处理ByteBufConvert注解中的index字段
+         * #xx_buffer.readableBytes => #xx_buffer.writeIndex
+         * 这里为什么不用writeableBytes, 因为在encode阶段, 容量是弹性扩容的
+         * 需要修改为writeIndex, 指定当前的写索引
+         */
         protected static String resolveEncodeByteBufConvertAnonLength(String byteBufConvertLength) {
             final String findStr = "readableBytes";
             final String replaceStr = "writableBytes";
-            if (byteBufConvertLength.endsWith("readableBytes()")) {
+            if (byteBufConvertLength.matches(".*readableBytes.*")){
                 return byteBufConvertLength.replace(findStr, replaceStr);
             }
             return byteBufConvertLength;
@@ -536,7 +555,8 @@ public class ProtocolProcessor extends AbstractProcessor {
                 if (isCollection & byteBufConvertAnon.parameters().length == 0) {
                     throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
-                byteBufConvertModelIndex = byteBufConvertAnon.index();
+                // 这里需要处理encode转换readerIndex => writeIndex
+                byteBufConvertModelIndex = resolveEncodeByteBufConvertAnonIndex(byteBufConvertAnon.index());
                 // 这里需要处理encode转换readableBytes => writableBytes
                 byteBufConvertModelLength = resolveEncodeByteBufConvertAnonLength(byteBufConvertAnon.length());
                 byteBufConvertModelCondition = byteBufConvertAnon.condition();
@@ -666,11 +686,11 @@ public class ProtocolProcessor extends AbstractProcessor {
                     .forEach(byteBufValidationAnon -> {
                         final boolean isValidate = false;
                         final ByteBufValidation.Validate validate = byteBufValidationAnon.validate();
-                        final String validateIndex = validate.index();
-                        final String validateLength = validate.length();
+                        final String validateIndex = resolveEncodeByteBufConvertAnonIndex(validate.index());
+                        final String validateLength = resolveEncodeByteBufConvertAnonLength(validate.length());
                         final ByteBufValidation.Mapper mapper = byteBufValidationAnon.mapper();
-                        final String mapperIndex = mapper.index();
-                        final String mapperLength = mapper.length();
+                        final String mapperIndex = resolveEncodeByteBufConvertAnonIndex(mapper.index());
+                        final String mapperLength = resolveEncodeByteBufConvertAnonLength(mapper.length());
                         final String[] parameters = byteBufValidationAnon.parameters();
                         // validate resolve qualifier/simple
                         final String validateMethodQualifierName = TypeUtils.resolveClassTypeMirrorException(byteBufValidationAnon::validateMethod);
