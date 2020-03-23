@@ -26,7 +26,7 @@ public interface ProtocolGenerateConstant {
     String _INIT_METHOD_PARAMETER_CHANNEL = "channel";
 
     /* 外部依赖引入的typeName */
-    String CHANNEL_UTILS_QUALIFIER_NAME = "com.bofa.codec.util.ChannelSpelContextUtils";
+    String CHANNEL_UTILS_QUALIFIER_NAME = "com.bofa.protocol.codec.util.ChannelSpelContextUtils";
     String CHANNEL_UTILS_TYPE_NAME = "ChannelSpelContextUtils";
     String CHANNEL_QUALIFIER_NAME = "io.netty.channel.Channel";
     String CHANNEL_TYPE_NAME = "Channel";
