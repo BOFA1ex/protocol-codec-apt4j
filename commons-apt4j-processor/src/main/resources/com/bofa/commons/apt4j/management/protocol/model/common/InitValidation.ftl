@@ -20,10 +20,10 @@
             ${validate_simple_name}.INSTANCE.mapper(${buffer_parameter}, ${channel_parameter},
         </#if>
     </#if>
-    "${validate_index}",
-    "${validate_length}",
-    "${mapper_index}",
-    "${mapper_length}"<#rt>
+    ${validate_index},
+    ${validate_length},
+    ${mapper_index},
+    ${mapper_length}<#rt>
     <@compress single_line=true>
         <#if anon_params?? && anon_params?has_content>, <#list anon_params as anon_param>"${anon_param}"<#if anon_param_has_next>, </#if></#list></#if>
     </@compress>
