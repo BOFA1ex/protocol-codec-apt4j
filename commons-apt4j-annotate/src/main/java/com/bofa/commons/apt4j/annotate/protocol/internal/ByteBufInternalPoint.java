@@ -10,15 +10,24 @@ import java.lang.annotation.*;
 @Documented
 public @interface ByteBufInternalPoint {
 
-    /** 默认步长为0, 即当前readerIndex/writerIndex */
+    /** 步长 */
     String step() default "0";
 
     /** 当步长值不为常量, 需要引用model以及对应的property */
     ByteBufInternalModel stepExpr() default @ByteBufInternalModel();
 
-    /** 区分步长值的类型 */
-    boolean normal() default true;
+    /** 步长类型 */
+    StepType stepType() default StepType.NORMAL;
 
-    /* 步长方向 */
+    /** 步长方向 */
     boolean reverse() default false;
+
+    enum StepType{
+        // readerIndex/writerIndex
+        NORMAL(),
+        // use stepExpr
+        STEP_EXPR(),
+        // readableBytes/writeableBytes
+        REVERSE();
+    }
 }
