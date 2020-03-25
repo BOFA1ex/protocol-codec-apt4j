@@ -16,7 +16,5 @@ public @interface Protocol {
 
     String implName();
 
-    SpelVar[] variables() default {
-            @SpelVar(key = "_buffer", value = "buffer"),
-    };
+    SpelVar[] variables() default {};
 }
