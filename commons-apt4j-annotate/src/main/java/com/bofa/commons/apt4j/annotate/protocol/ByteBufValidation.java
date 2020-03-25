@@ -1,5 +1,7 @@
 package com.bofa.commons.apt4j.annotate.protocol;
 
+import com.bofa.commons.apt4j.annotate.protocol.internal.ByteBufInternalPoint;
+
 import java.lang.annotation.*;
 
 /**
@@ -17,7 +19,7 @@ public @interface ByteBufValidation {
     Validate validate();
 
     /* 缓冲区组装域 */
-    Mapper mapper() default @Mapper(index = "", length = "");
+    Mapper mapper();
 
     /* 校验方法 */
     Class<?> validateMethod();
@@ -28,19 +30,18 @@ public @interface ByteBufValidation {
     /* 额外的参数 */
     String[] parameters() default {};
 
-    @Retention(RetentionPolicy.SOURCE)
-    @Documented
-    @interface Validate {
-        String index();
 
-        String length();
+    @interface Validate {
+        ByteBufInternalPoint index();
+
+        ByteBufInternalPoint length();
     }
 
     @Retention(RetentionPolicy.SOURCE)
     @Documented
     @interface Mapper {
-        String index();
+        ByteBufInternalPoint index();
 
-        String length();
+        ByteBufInternalPoint length();
     }
 }
