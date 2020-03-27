@@ -1,5 +1,6 @@
 package com.bofa.commons.apt4j.management.internal.utils;
 
+import com.google.common.base.Strings;
 import com.sun.tools.javac.code.Symbol;
 import com.sun.tools.javac.code.Type;
 
@@ -40,5 +41,13 @@ public class TypeUtils {
             // 由于注解给定的class对象default值不能为null, 只能默认指定Void.class.
             return typeName.endsWith("Void") ? null : typeName;
         }
+    }
+
+    public static String qualifierTypeName2SimpleName(String qualifierName) {
+        if (Strings.isNullOrEmpty(qualifierName)) {
+            return null;
+        }
+        String[] temp = qualifierName.split("\\.");
+        return temp[temp.length - 1];
     }
 }
