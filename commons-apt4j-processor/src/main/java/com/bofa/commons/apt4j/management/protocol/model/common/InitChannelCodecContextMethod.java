@@ -14,7 +14,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class InitChannelSpelContextMethod extends JavaModelWritable {
+public class InitChannelCodecContextMethod extends JavaModelWritable {
 
     private MethodHeadModel method_head;
     private List<SpelVarModel> spel_vars;

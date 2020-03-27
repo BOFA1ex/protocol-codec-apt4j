@@ -9,13 +9,12 @@ import java.util.Set;
 /**
  * @author bofa1ex
  * @version 1.0
- * @package com.bofa.commons.apt4j.management.protocol.model
- * @date 2020/3/3
+ * @since  2020/3/3
  */
 @Getter
 @Setter
 @Builder
-public class InitMarkAndReadSliceMethod extends JavaModelWritable {
+public class InitReadSliceMethod extends JavaModelWritable {
 
     public static final String SYSTEM_LOG_MESSAGE = "\"数据包不完整 %s\"";
     public static final String LOGBACK_LOG_MESSAGE = "\"数据包不完整 {}\"";
