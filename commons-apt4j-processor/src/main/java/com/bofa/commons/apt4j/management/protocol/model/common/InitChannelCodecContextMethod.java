@@ -1,5 +1,6 @@
 package com.bofa.commons.apt4j.management.protocol.model.common;
 
+import com.bofa.commons.apt4j.annotate.cache.CacheVar;
 import com.bofa.commons.apt4j.management.internal.model.MethodHeadModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import lombok.*;
@@ -17,27 +18,7 @@ import java.util.Set;
 public class InitChannelCodecContextMethod extends JavaModelWritable {
 
     private MethodHeadModel method_head;
-    private List<SpelVarModel> spel_vars;
-
-    @Getter
-    @Setter
-    public static class SpelVarModel extends JavaModelWritable{
-        private String key;
-        private String value;
-
-        public SpelVarModel(String key, String value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public Set<String> getStatic_import_stats() {
-            return null;
-        }
-
-        public Set<String> getImport_stats() {
-            return null;
-        }
-    }
+    private CacheVar[] cache_vars;
 
     public Set<String> getStatic_import_stats() {
         return null;

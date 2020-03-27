@@ -9,7 +9,7 @@
 <#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.common.InitChannelCodecContextMethod" -->
 <@builder.build_method_head method_head>
     ChannelCodecContextUtils.setVariable(objName, obj, channel);
-    <#list spel_vars as spel_var>
-        ChannelCodecContextUtils.setVariable(objName + "${spel_var.key}", ${spel_var.value}, channel);
+    <#list cache_vars as cache_var>
+        ChannelCodecContextUtils.setVariable(objName + "${cache_var.key()}", ${cache_var.value()}, channel);
     </#list>
 </@builder.build_method_head>
