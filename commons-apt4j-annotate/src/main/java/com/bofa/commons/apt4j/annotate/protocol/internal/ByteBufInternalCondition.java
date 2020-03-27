@@ -13,9 +13,6 @@ public @interface ByteBufInternalCondition {
     /** condition 引用的model和对应的property */
     ByteBufInternalModel model() default @ByteBufInternalModel();
 
-    /** 默认condition为true */
-    boolean skip() default true;
-
     /** 操作运算符 */
     String operator() default "==";
 

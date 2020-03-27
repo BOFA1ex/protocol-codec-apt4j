@@ -14,15 +14,15 @@ public @interface ByteBufInternalPoint {
     String step() default "0";
 
     /** 当步长值不为常量, 需要引用model以及对应的property */
-    ByteBufInternalModel stepExpr() default @ByteBufInternalModel();
+    ByteBufInternalModel model() default @ByteBufInternalModel();
 
-    /** 步长正常类型 */
-    boolean normalType() default true;
-    /** 步长model类型 */
-    boolean stepExprType() default false;
-    /** 步长反向类型 */
-    boolean reverseType() default false;
+    /** 步长类型 */
+    StepType type() default StepType.NORMAL;
 
-    /** 步长方向 */
-    boolean reverse() default false;
+    /** 步长类型枚举 */
+    enum StepType {
+        NORMAL(),
+        MODEL(),
+        REVERSE()
+    }
 }
