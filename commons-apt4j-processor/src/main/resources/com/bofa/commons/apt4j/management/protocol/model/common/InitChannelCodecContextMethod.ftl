@@ -6,10 +6,10 @@
 
 -->
 <#import "../../../internal/lib/ModelBuilder.ftl" as builder/>
-<#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.common.InitChannelSpelContextMethod" -->
+<#-- @ftlvariable name="" type="com.bofa.commons.apt4j.management.protocol.model.common.InitChannelCodecContextMethod" -->
 <@builder.build_method_head method_head>
-    ChannelSpelContextUtils.setVariable(objName, obj, channel);
+    ChannelCodecContextUtils.setVariable(objName, obj, channel);
     <#list spel_vars as spel_var>
-        ChannelSpelContextUtils.setVariable(objName + "${spel_var.key}", ${spel_var.value}, channel);
+        ChannelCodecContextUtils.setVariable(objName + "${spel_var.key}", ${spel_var.value}, channel);
     </#list>
 </@builder.build_method_head>
