@@ -1,25 +1,25 @@
 package com.bofa.commons.apt4j.management.protocol.model.encode;
 
+import com.bofa.commons.apt4j.annotate.protocol.ByteBufConvert;
 import com.bofa.commons.apt4j.management.internal.model.TypeModel;
+import com.bofa.commons.apt4j.management.internal.utils.TypeUtils;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
-import com.bofa.commons.apt4j.management.protocol.model.common.ByteBufConvertAnonModel;
-import com.google.common.collect.Sets;
 import lombok.*;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
  * @author bofa1ex
  * @version 1.0
- * @package com.bofa.commons.apt4j.management.protocol.model.decode
- * @date 2020/3/6
+ * @since 2020/3/6
  */
 @Getter
 @Setter
 @Builder
-public class ProtocolEncodePart$0 extends JavaModelWritable {
+public class ProtocolEncodeConvertMethod extends JavaModelWritable {
 
-    private ByteBufConvertAnonModel convert_anon_model;
+    private ByteBufConvert convert_anon;
     private TypeModel encode_type;
     private String encode_element_name;
     private String channel_parameter;
@@ -30,7 +30,7 @@ public class ProtocolEncodePart$0 extends JavaModelWritable {
     }
 
     public Set<String> getImport_stats() {
-        super.import_stats.addAll(convert_anon_model.getImport_stats());
+        super.import_stats.addAll(encode_type.getImport_stats());
         return import_stats;
     }
 }

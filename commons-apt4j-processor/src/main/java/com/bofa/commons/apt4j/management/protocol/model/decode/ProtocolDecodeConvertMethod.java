@@ -1,9 +1,8 @@
 package com.bofa.commons.apt4j.management.protocol.model.decode;
 
+import com.bofa.commons.apt4j.annotate.protocol.ByteBufConvert;
 import com.bofa.commons.apt4j.management.internal.model.TypeModel;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
-import com.bofa.commons.apt4j.management.protocol.model.common.ByteBufConvertAnonModel;
-import com.google.common.collect.Sets;
 import lombok.*;
 
 import java.util.Set;
@@ -17,13 +16,14 @@ import java.util.Set;
 @Getter
 @Setter
 @Builder
-public class ProtocolDecodePart$0 extends JavaModelWritable {
+public class ProtocolDecodeConvertMethod extends JavaModelWritable {
 
-    private ByteBufConvertAnonModel convert_anon_model;
+    private ByteBufConvert convert_anon;
     private TypeModel decode_type;
     private String decode_type_name;
     private String channel_parameter;
     private String confused_buffer_name;
+
 
     public Set<String> getStatic_import_stats() {
         return null;
@@ -31,7 +31,6 @@ public class ProtocolDecodePart$0 extends JavaModelWritable {
 
     public Set<String> getImport_stats() {
         super.import_stats.addAll(decode_type.getImport_stats());
-        super.import_stats.addAll(convert_anon_model.getImport_stats());
         return import_stats;
     }
 }
