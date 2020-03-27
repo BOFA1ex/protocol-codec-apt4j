@@ -16,18 +16,13 @@ public @interface ByteBufInternalPoint {
     /** 当步长值不为常量, 需要引用model以及对应的property */
     ByteBufInternalModel stepExpr() default @ByteBufInternalModel();
 
-    /** 步长类型 */
-    StepType stepType() default StepType.NORMAL;
+    /** 步长正常类型 */
+    boolean normalType() default true;
+    /** 步长model类型 */
+    boolean stepExprType() default false;
+    /** 步长反向类型 */
+    boolean reverseType() default false;
 
     /** 步长方向 */
     boolean reverse() default false;
-
-    enum StepType{
-        // readerIndex/writerIndex
-        NORMAL(),
-        // use stepExpr
-        STEP_EXPR(),
-        // readableBytes/writeableBytes
-        REVERSE();
-    }
 }
