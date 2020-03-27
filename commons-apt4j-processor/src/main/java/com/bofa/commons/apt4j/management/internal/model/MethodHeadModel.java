@@ -8,8 +8,7 @@ import java.util.*;
 /**
  * @author bofa1ex
  * @version 1.0
- * @package com.bofa.commons.apt4j.management.internal.model
- * @date 2020/3/4
+ * @since  2020/3/4
  */
 
 @Getter
@@ -17,7 +16,7 @@ import java.util.*;
 @Builder
 public class MethodHeadModel extends JavaModelWritable {
 
-    public static final String PRIVATE_FINAL = "private final";
+    public static final String PRIVATE = "private";
 
     private String modifier;
     private TypeModel return_type;
