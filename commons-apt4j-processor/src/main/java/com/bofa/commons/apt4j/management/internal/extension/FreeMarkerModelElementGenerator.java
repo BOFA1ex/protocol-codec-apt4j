@@ -5,6 +5,7 @@
  */
 package com.bofa.commons.apt4j.management.internal.extension;
 
+import com.bofa.commons.apt4j.management.internal.directive.MirrorTypeExceptionResolveMethod;
 import com.bofa.commons.apt4j.management.internal.writable.FreeMarkerWritable;
 import freemarker.ext.beans.*;
 import freemarker.template.*;
@@ -16,7 +17,7 @@ import java.util.Map;
 /**
  * Delegate for writing given {@link com.bofa.commons.apt4j.management.internal.writable.Writable}s into a {@link java.io.Writer} using
  * FreeMarker templates. Any parameters passed to the
- * {@link FreeMarkerModelIncludeDirective} in addition to element itself can be accessed
+ * {@link com.bofa.commons.apt4j.management.internal.directive.FreeMarkerModelIncludeDirective} in addition to element itself can be accessed
  * from within the template using the {@code ext} pseudo-element.
  *
  * @author Gunnar Morling
@@ -60,7 +61,7 @@ public class FreeMarkerModelElementGenerator {
         }
 
         @Override
-        public boolean isEmpty() throws TemplateModelException {
+        public boolean isEmpty() {
             return object.isEmpty() && extParams.isEmpty();
         }
     }

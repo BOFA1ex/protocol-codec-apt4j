@@ -1,5 +1,7 @@
 package com.bofa.commons.apt4j.management.internal.extension;
 
+import com.bofa.commons.apt4j.management.internal.directive.FreeMarkerModelIncludeDirective;
+import com.bofa.commons.apt4j.management.internal.directive.MirrorTypeExceptionResolveMethod;
 import com.bofa.commons.apt4j.management.internal.writable.Writable;
 import com.bofa.commons.apt4j.management.internal.writer.IndentationCorrectingWriter;
 import freemarker.cache.StrongCacheStorage;
@@ -45,6 +47,10 @@ public class FreeMarkerModelGenerator {
         CONFIGURATION.setSharedVariable(
                 "includeModel",
                 new FreeMarkerModelIncludeDirective(CONFIGURATION)
+        );
+        CONFIGURATION.setSharedVariable(
+                "resolveTypeMirror",
+                new MirrorTypeExceptionResolveMethod()
         );
         // do not refresh/gc the cached templates, as we never change them at runtime
         CONFIGURATION.setCacheStorage(new StrongCacheStorage());
@@ -139,12 +145,12 @@ public class FreeMarkerModelGenerator {
         }
 
         @Override
-        public Object findTemplateSource(String name) throws IOException {
+        public Object findTemplateSource(String name) {
             return name;
         }
 
         @Override
-        public void closeTemplateSource(Object templateSource) throws IOException {
+        public void closeTemplateSource(Object templateSource) {
         }
     }
 
@@ -153,11 +159,11 @@ public class FreeMarkerModelGenerator {
      *
      * @author Gunnar Morling
      */
-    static class DefaultModelElementWriterContext implements Context {
+    public static class DefaultModelElementWriterContext implements Context {
 
         private final Map<Class<?>, Object> values;
 
-        DefaultModelElementWriterContext(Map<Class<?>, Object> values) {
+        public DefaultModelElementWriterContext(Map<Class<?>, Object> values) {
             this.values = new HashMap<>(values);
         }
 

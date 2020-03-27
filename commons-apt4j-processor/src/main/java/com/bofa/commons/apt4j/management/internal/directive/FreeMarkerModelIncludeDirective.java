@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License version 2.0, available at http://www.apache.org/licenses/LICENSE-2.0
  */
-package com.bofa.commons.apt4j.management.internal.extension;
+package com.bofa.commons.apt4j.management.internal.directive;
 
 import com.bofa.commons.apt4j.management.internal.writable.Writable;
 import freemarker.core.Environment;
