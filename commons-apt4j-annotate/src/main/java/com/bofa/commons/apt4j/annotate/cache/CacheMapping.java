@@ -1,4 +1,4 @@
-package com.bofa.commons.apt4j.annotate.spel;
+package com.bofa.commons.apt4j.annotate.cache;
 
 import java.lang.annotation.*;
 
@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.SOURCE)
 @Documented
-public @interface SpelMapping {
+public @interface CacheMapping {
     String value();
 }
