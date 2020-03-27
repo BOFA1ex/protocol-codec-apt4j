@@ -6,8 +6,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * @author bofa1ex
  * @version 1.0
- * @package com.bofa.commons.apt4j.management.internal.constant
- * @date 2020/3/3
+ * @since  2020/3/3
  */
 public interface JavaModelConstant {
 
@@ -39,15 +38,17 @@ public interface JavaModelConstant {
      * javadoc template
      */
     String JAVADOC_START = "/**";
-    String JAVADOC_SEPARATOR = " *";
-    String JAVADOC_END = " */";
+    String JAVADOC_SEPARATOR = "*";
+    String JAVADOC_END = "*/";
 
-    String DEFAULT_JAVADOC_TEMPLATE = String.format(
-            "%1$s " + "\n" +
-                    "%2$s generate by freemarker" + "\n" +
-                    "%2$s @author\t\t%4$s" + "\n" +
-                    "%2$s @since\t\t%5$s"  + "\n" +
-            "%3$s",
+    String DEFAULT_JAVADOC_TEMPLATE =
+            String.format(
+            "%1$3s " + "\n" +
+                    " %2$2s generate by freemarker" + "\n" +
+                    " %2$2s \n" +
+                    " %2$2s @author\t%4$s" + "\n" +
+                    " %2$2s @since\t%5$s"  + "\n" +
+            " %3$3s",
             JAVADOC_START, JAVADOC_SEPARATOR, JAVADOC_END,
             USER_NAME, LocalDateTime.now().format(DateTimeFormatter.ofPattern(YYYYMMDDHHMMSS)));
 }
