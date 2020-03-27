@@ -1,6 +1,6 @@
 package com.bofa.commons.apt4j.annotate.protocol;
 
-import com.bofa.commons.apt4j.annotate.spel.SpelVar;
+import com.bofa.commons.apt4j.annotate.cache.CacheVar;
 
 import java.lang.annotation.*;
 
@@ -16,5 +16,5 @@ public @interface Protocol {
 
     String implName();
 
-    SpelVar[] variables() default {};
+    CacheVar[] variables() default {};
 }
