@@ -40,6 +40,9 @@ public class ProtocolDecodeInternalMethod extends JavaModelWritable {
     /* 缓冲区的混淆名 */
     private String confused_buffer_name;
 
+    public String collection_type(){
+        return part0.getConvert_anon().parameters()[0];
+    }
     public void addAllInternalModelContext(List<InternalModelContext> internalModelContexts){
         this.member_mappings.addAll(internalModelContexts);
         internalModelContexts.forEach(internalModelContext -> super.import_stats.addAll(internalModelContext.getImport_stats()));

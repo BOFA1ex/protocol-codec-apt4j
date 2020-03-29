@@ -2,7 +2,7 @@ package com.bofa.commons.apt4j.management.protocol.model.common;
 
 
 import com.bofa.commons.apt4j.annotate.protocol.ByteBufConvert;
-import com.bofa.commons.apt4j.annotate.protocol.internal.ByteBufInternalPoint;
+import com.bofa.commons.apt4j.annotate.protocol.internal.*;
 import com.bofa.commons.apt4j.management.internal.utils.TypeUtils;
 import com.bofa.commons.apt4j.management.internal.writable.JavaModelWritable;
 import com.bofa.commons.apt4j.management.protocol.model.ProtocolImpl;
@@ -27,6 +27,74 @@ public class InitConditionIndexLength extends JavaModelWritable {
     private String buffer_parameter;
 
     private ByteBufConvert convert_anon;
+
+    public ByteBufInternalCondition condition(){
+        return convert_anon.condition();
+    }
+
+    public ByteBufInternalPoint index(){
+        return convert_anon.index();
+    }
+
+    public ByteBufInternalPoint length(){
+        return convert_anon.length();
+    }
+
+    public String[] convert_parameters(){
+        return convert_anon.parameters();
+    }
+
+    public String index_step(){
+        return index().step();
+    }
+
+    public String length_step(){
+        return length().step();
+    }
+
+    public ByteBufInternalModel index_model(){
+        return index().model();
+    }
+
+    public ByteBufInternalModel length_model(){
+        return length().model();
+    }
+
+    public ByteBufInternalModel condition_model(){
+        return condition().model();
+    }
+
+    public String condition_operator(){
+        return condition().operator();
+    }
+
+    public String condition_compare_value(){
+        return condition().compareValue();
+    }
+
+    public String condition_model_key(){
+        return condition_model().key();
+    }
+
+    public String condition_model_prop(){
+        return condition_model().prop();
+    }
+
+    public String index_model_key(){
+        return index_model().key();
+    }
+
+    public String index_model_prop(){
+        return index_model().prop();
+    }
+
+    public String length_model_key(){
+        return length_model().key();
+    }
+
+    public String length_model_prop(){
+        return length_model().prop();
+    }
 
     public boolean is_normal(ByteBufInternalPoint point){
         return point.type() == ByteBufInternalPoint.StepType.NORMAL;

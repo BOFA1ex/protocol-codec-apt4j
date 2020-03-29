@@ -13,7 +13,7 @@
         final ByteBuf ${confused_buffer_name} = ${resolveTypeMirror(convert_anon)}.INSTANCE.encode(${encode_element_name}, length, ${channel_parameter}<#rt>
     </#if>
     <@compress single_line=true>
-        <#if convert_anon.parameters()?has_content>, <#list convert_anon.parameters() as parameter>"${parameter}"<#if parameter_has_next>, </#if></#list></#if>
+        <#if convert_parameters()?has_content>, <#list convert_parameters() as parameter>"${parameter}"<#if parameter_has_next>, </#if></#list></#if>
     </@compress>
     <#lt>);
 </@compress>

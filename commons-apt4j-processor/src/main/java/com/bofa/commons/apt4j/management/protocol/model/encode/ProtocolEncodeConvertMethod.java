@@ -25,6 +25,10 @@ public class ProtocolEncodeConvertMethod extends JavaModelWritable {
     private String channel_parameter;
     private String confused_buffer_name;
 
+    public String[] convert_parameters(){
+        return convert_anon.parameters();
+    }
+
     public Set<String> getStatic_import_stats() {
         return null;
     }

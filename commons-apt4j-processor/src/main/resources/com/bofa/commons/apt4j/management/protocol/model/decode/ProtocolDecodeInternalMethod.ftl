@@ -24,7 +24,7 @@
             <#if is_cache_obj()>
                 ${decode_type.type_simple_name} ${decode_element_name} = new ${decode_type.type_simple_name}();
             <#elseif is_collection()>
-                ${decode_type.type_simple_name} ${decode_element_name} = new ${part0.convert_anon.parameters()[0]}<>();
+                ${decode_type.type_simple_name} ${decode_element_name} = new ${collection_type()}<>();
             </#if>
             _init("${decode_element_name}", ${decode_element_name}, ${channel_parameter});
         </#if>
