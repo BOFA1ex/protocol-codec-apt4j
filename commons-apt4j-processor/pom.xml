@@ -11,15 +11,14 @@
     <artifactId>commons-apt4j-processor</artifactId>
 
     <dependencies>
-        <!-- compile -->
-        <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
-        </dependency>
         <!-- commons-annotate -->
         <dependency>
             <groupId>com.bofa</groupId>
             <artifactId>commons-apt4j-annotate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
         </dependency>
         <dependency>
             <groupId>com.sun</groupId>
@@ -32,15 +31,8 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
         </dependency>
     </dependencies>
     <build>
@@ -59,8 +51,8 @@
                         <arg>
                             lombok.launch.AnnotationProcessorHider$AnnotationProcessor,lombok.launch.AnnotationProcessorHider$ClaimingProcessor
                         </arg>
-<!--                        <arg>-proc:none</arg>-->
-<!--                        <arg>-Xlint:all,-options,-path</arg>-->
+                        <!--                        <arg>-proc:none</arg>-->
+                        <!--                        <arg>-Xlint:all,-options,-path</arg>-->
                     </compilerArgs>
                     <source>1.8</source>
                     <target>1.8</target>
