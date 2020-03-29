@@ -10,7 +10,6 @@
         <artifactId>commons-apt4j</artifactId>
     </parent>
     <artifactId>commons-apt4j-annotate</artifactId>
-    <version>${parent.version}</version>
 
     <name>commons :: apt4j :: annotate</name>
     <properties>
