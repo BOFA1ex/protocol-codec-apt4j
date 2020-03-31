@@ -129,7 +129,9 @@ public class ProtocolProcessor extends AbstractProcessor {
                         .build())
                 // 初始化后续需要decode/encode的内部元素以及commons方法
                 .decode_elements(Lists.newArrayList())
+                .decode_root_elements(Lists.newArrayList())
                 .encode_elements(Lists.newArrayList())
+                .encode_root_elements(Lists.newArrayList())
                 .common_methods(Lists.newArrayList())
                 // 需要注入的对象(convertMethods, validationMethods, resolveException)
                 .autowires(Sets.newHashSet())
@@ -469,7 +471,7 @@ public class ProtocolProcessor extends AbstractProcessor {
             // inject validation condition
             injectValidateInOverrideEncodeMethod((TypeElement) encodeSymbol);
             // inject ProtocolOverrideEncodeMethod
-            this.protocolImplModel.setEncode_root_element(overrideEncode);
+            this.protocolImplModel.addEncode_root_element(overrideEncode);
             return this;
         }
 
@@ -489,14 +491,19 @@ public class ProtocolProcessor extends AbstractProcessor {
             boolean isCacheObj = (typeEnum == CACHE_OBJ);
             boolean isCollection = (typeEnum == COLLECTION);
             boolean isNotPrimitive = typeEnum != PRIMITIVE;
+            final String convertMethodName = convertAnon == null ? null : TypeUtils.resolveClassTypeMirrorException(convertAnon::convertMethod);
             if (isCollection){
-                if (unRoot && convertAnon.parameters().length == 0){
-                    messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
-                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
-                }
+                // 如果为返参, 需要判断ByteBufDecode的parameters
                 if (!unRoot && methodElement.getAnnotation(ByteBufDecode.class).parameters().length == 0){
-                    messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
+                    messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING, "集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                     throw new IllegalArgumentException("集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
+                }
+                // 如果convertMethod为空, 需要指定parameters
+                if (Strings.isNullOrEmpty(convertMethodName) && convertAnon != null){
+                    if (unRoot && convertAnon.parameters().length == 0){
+                        messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING, "集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
+                        throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
+                    }
                 }
             }
             /*
@@ -573,7 +580,8 @@ public class ProtocolProcessor extends AbstractProcessor {
             if (typeEnum == CACHE_OBJ) {
                 protocolEncodeInternalMethod.addAllInternalModelContext(step_processInternalRecursive(typeSymbol));
             }
-            if (typeEnum == COLLECTION) {
+            // 如果是集合元素并且convertMethod为空
+            if (typeEnum == COLLECTION && Strings.isNullOrEmpty(convertMethodName)) {
                 // 获取集合元素的泛型元素
                 final Element genericElement = ElementUtils.getGenericElement(typeUtils, element);
                 final Symbol genericClassElement = TypeUtils.getTypeSymbol(typeUtils, genericElement.asType());
@@ -721,7 +729,7 @@ public class ProtocolProcessor extends AbstractProcessor {
             // inject validation condition
             injectValidateInOverrideDecodeMethod((TypeElement) methodReturnTypeElement);
             // inject ProtocolOverrideDecodeMethod
-            this.protocolImplModel.setDecode_root_element(overrideDecode);
+            this.protocolImplModel.addDecode_root_element(overrideDecode);
             return this;
         }
 
@@ -742,14 +750,19 @@ public class ProtocolProcessor extends AbstractProcessor {
             boolean isNotPrimitive = typeEnum != PRIMITIVE;
             final ByteBufConvert convertAnon = element.getAnnotation(ByteBufConvert.class);
             final String obfuscateBufferName = unRoot ? generateObfuscatedName(decodeByteBufParameterName) : decodeByteBufParameterName;
+            final String convertMethodName = convertAnon == null ? null : TypeUtils.resolveClassTypeMirrorException(convertAnon::convertMethod);
             if (isCollection){
-                if (unRoot && convertAnon.parameters().length == 0){
-                    messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
-                    throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
-                }
+                // 如果为返参, 需要判断ByteBufDecode的parameters
                 if (!unRoot && methodElement.getAnnotation(ByteBufDecode.class).parameters().length == 0){
                     messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                     throw new IllegalArgumentException("集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
+                }
+                // 如果convertMethod为空, 需要指定parameters
+                if (Strings.isNullOrEmpty(convertMethodName) && convertAnon != null){
+                    if (unRoot && convertAnon.parameters().length == 0){
+                        messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
+                        throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
+                    }
                 }
             }
             /*
@@ -812,7 +825,8 @@ public class ProtocolProcessor extends AbstractProcessor {
             if (typeEnum == CACHE_OBJ) {
                 protocolDecodeInternalMethod.addAllInternalModelContext(step_processInternalRecursive(typeSymbol));
             }
-            if (typeEnum == COLLECTION) {
+            // 如果是集合元素并且convertMethod为空
+            if (typeEnum == COLLECTION && Strings.isNullOrEmpty(convertMethodName)) {
                 // 获取集合元素的泛型元素
                 final Element genericElement = ElementUtils.getGenericElement(typeUtils, element);
                 final Symbol genericClassElement = TypeUtils.getTypeSymbol(typeUtils, genericElement.asType());

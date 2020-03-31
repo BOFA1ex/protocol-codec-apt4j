@@ -27,9 +27,9 @@ public class ProtocolImpl extends JavaModelWritable {
 
     private String package_name;
     private TypeHeadModel type_head;
-    private ProtocolOverrideDecodeMethod decode_root_element;
+    private List<ProtocolOverrideDecodeMethod> decode_root_elements;
     private List<ProtocolDecodeInternalMethod> decode_elements;
-    private ProtocolOverrideEncodeMethod encode_root_element;
+    private List<ProtocolOverrideEncodeMethod> encode_root_elements;
     private List<ProtocolEncodeInternalMethod> encode_elements;
     private List<JavaModelWritable> common_methods;
     private Set<String> autowires;
@@ -48,13 +48,13 @@ public class ProtocolImpl extends JavaModelWritable {
         return import_stats;
     }
 
-    public void setDecode_root_element(ProtocolOverrideDecodeMethod decode_root_element) {
-        this.decode_root_element = decode_root_element;
+    public void addDecode_root_element(ProtocolOverrideDecodeMethod decode_root_element) {
+        this.decode_root_elements.add(decode_root_element);
         super.import_stats.addAll(decode_root_element.getImport_stats());
     }
 
-    public void setEncode_root_element(ProtocolOverrideEncodeMethod encode_root_element) {
-        this.encode_root_element = encode_root_element;
+    public void addEncode_root_element(ProtocolOverrideEncodeMethod encode_root_element) {
+        this.encode_root_elements.add(encode_root_element);
         super.import_stats.addAll(encode_root_element.getImport_stats());
     }
 

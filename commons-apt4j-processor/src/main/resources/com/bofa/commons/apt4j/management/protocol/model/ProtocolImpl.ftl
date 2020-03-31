@@ -26,16 +26,20 @@ ${javadoc()}
             private ${autowire} ${autowire?uncap_first};
         </#list>
     </#if>
-    <#if encode_root_element??>
-        <@includeModel object=encode_root_element/>
+    <#if encode_root_elements?? && encode_root_elements?has_content>
+        <#list encode_root_elements as encode_root_element>
+            <@includeModel object=encode_root_element/>
+        </#list>
     </#if>
     <#if encode_elements?? && encode_elements?has_content>
         <#list encode_elements as encode_element>
             <@includeModel object=encode_element/>
         </#list>
     </#if>
-    <#if decode_root_element??>
-        <@includeModel object=decode_root_element/>
+    <#if decode_root_elements?? && decode_root_elements?has_content>
+        <#list decode_root_elements as decode_root_element>
+            <@includeModel object=decode_root_element/>
+        </#list>
     </#if>
     <#if decode_elements?? && decode_elements?has_content>
         <#list decode_elements as decode_element>
