@@ -150,13 +150,13 @@ public class ProtocolProcessor extends AbstractProcessor {
                     final ByteBufDecode byteBufDecodeAnon = ele.getAnnotation(ByteBufDecode.class);
                     final ByteBufEncode byteBufEncodeAnon = ele.getAnnotation(ByteBufEncode.class);
                     if (byteBufEncodeAnon != null) {
-                        ProtocolEncodeProcessor.step1_injectContext(elementUtils, typeUtils)
+                        ProtocolEncodeProcessor.step1_injectContext(elementUtils, typeUtils, messager)
                                 .step2_prepareCache(ele, protocolImplModel)
                                 .step3_overrideEncode()
                                 .step__over();
                     }
                     if (byteBufDecodeAnon != null) {
-                        ProtocolDecodeProcessor.step1_injectContext(elementUtils, typeUtils)
+                        ProtocolDecodeProcessor.step1_injectContext(elementUtils, typeUtils, messager)
                                 .step2_prepareCache(ele, protocolImplModel)
                                 .step3_overrideDecode()
                                 .step__over();
@@ -270,6 +270,8 @@ public class ProtocolProcessor extends AbstractProcessor {
         protected Elements elementUtils;
         /* 处理节点类型工具 */
         protected Types typeUtils;
+        /* 打印编译日志工具 */
+        protected Messager messager;
 
         protected ProtocolImpl protocolImplModel;
 
@@ -379,10 +381,11 @@ public class ProtocolProcessor extends AbstractProcessor {
         private ProtocolOverrideEncodeMethod overrideEncode;
 
         /** 引入节点操作工具 */
-        public static ProtocolEncodeProcessor step1_injectContext(Elements elementUtils, Types typeUtils) {
+        public static ProtocolEncodeProcessor step1_injectContext(Elements elementUtils, Types typeUtils, Messager messager) {
             final ProtocolEncodeProcessor protocolEncodeProcessor = new ProtocolEncodeProcessor();
             protocolEncodeProcessor.setElementUtils(elementUtils);
             protocolEncodeProcessor.setTypeUtils(typeUtils);
+            protocolEncodeProcessor.setMessager(messager);
             return protocolEncodeProcessor;
         }
 
@@ -488,9 +491,11 @@ public class ProtocolProcessor extends AbstractProcessor {
             boolean isNotPrimitive = typeEnum != PRIMITIVE;
             if (isCollection){
                 if (unRoot && convertAnon.parameters().length == 0){
+                    messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                     throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
                 if (!unRoot && methodElement.getAnnotation(ByteBufDecode.class).parameters().length == 0){
+                    messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                     throw new IllegalArgumentException("集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
             }
@@ -638,10 +643,11 @@ public class ProtocolProcessor extends AbstractProcessor {
         private ProtocolOverrideDecodeMethod overrideDecode;
 
         /* 引入节点操作工具 */
-        public static ProtocolDecodeProcessor step1_injectContext(Elements elementUtils, Types typeUtils) {
+        public static ProtocolDecodeProcessor step1_injectContext(Elements elementUtils, Types typeUtils, Messager messager) {
             final ProtocolDecodeProcessor protocolDecodeProcessor = new ProtocolDecodeProcessor();
             protocolDecodeProcessor.setElementUtils(elementUtils);
             protocolDecodeProcessor.setTypeUtils(typeUtils);
+            protocolDecodeProcessor.setMessager(messager);
             return protocolDecodeProcessor;
         }
 
@@ -738,9 +744,11 @@ public class ProtocolProcessor extends AbstractProcessor {
             final String obfuscateBufferName = unRoot ? generateObfuscatedName(decodeByteBufParameterName) : decodeByteBufParameterName;
             if (isCollection){
                 if (unRoot && convertAnon.parameters().length == 0){
+                    messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                     throw new IllegalArgumentException("集合的泛型类型必须在ByteBufConvert的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
                 if (!unRoot && methodElement.getAnnotation(ByteBufDecode.class).parameters().length == 0){
+                    messager.printMessage(Diagnostic.Kind.ERROR, "集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                     throw new IllegalArgumentException("集合的泛型类型必须在ByteBufDecode的parameter中指定, 例如parameters = {\"java.util.LinkedList\"}");
                 }
             }
