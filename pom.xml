@@ -4,12 +4,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bofa</groupId>
     <version>1.0.2</version>
-    <artifactId>commons-apt4j</artifactId>
+    <artifactId>protocol-codec-apt4j</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>commons-apt4j-parent</module>
-        <module>commons-apt4j-processor</module>
-        <module>commons-apt4j-annotate</module>
+        <module>protocol-codec-apt4j-parent</module>
+        <module>protocol-codec-apt4j-processor</module>
+        <module>protocol-codec-apt4j-annotate</module>
     </modules>
-    <name>commons :: apt4j</name>
+    <name>protocol :: codec :: apt4j</name>
 </project>

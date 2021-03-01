@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bofa</groupId>
-    <artifactId>commons-apt4j-parent</artifactId>
+    <artifactId>protocol-codec-apt4j-parent</artifactId>
     <version>1.0.2</version>
     <packaging>pom</packaging>
 
-    <name>commons :: apt4j :: parent</name>
-    <description>commons annotation processor</description>
+    <name>protocol :: codec :: apt4j :: parent</name>
+    <description>protocol codec  annotation processor</description>
     <inceptionYear>2020</inceptionYear>
 
     <properties>
@@ -49,7 +49,7 @@
             <!-- commons-annotate -->
             <dependency>
                 <groupId>com.bofa</groupId>
-                <artifactId>commons-apt4j-annotate</artifactId>
+                <artifactId>protocol-codec-apt4j-annotate</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
